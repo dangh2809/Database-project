@@ -79,6 +79,9 @@ app.post('/SignUp',(req,res)=>{
 app.get('/createEvent',(req,res)=>{
   res.render('createEventPage');
 }) 
+app.get('/createRSO',(req,res)=>{
+  res.render('createRSOPage');
+}) 
 app.get('/',(req,res)=>{
   if(req.query.user)
   {
@@ -168,6 +171,32 @@ console.log(returnObject);
 
 }) 
 app.post('/createEvent',[
+  check('rsoName','Event cannot be empty').exists().isLength({min:1}),
+  check('rsoDescription','Description cannot be empty').exists().isLength({min:1}),
+  
+], function(req, res){ // Specifies which URL to listen for
+    // req.body -- contains form data
+
+    const error= validationResult(req)
+    if(!error.isEmpty())
+    {
+      const alert = error.array()
+      res.render('createRSO',{
+        alert
+      })
+    }
+    else{
+
+    
+    var object = req.body;
+    var sql = ``; // add later, need to see the final database
+    connection.query(sql, function (err, result) {
+      if (err) throw err;
+      res.redirect("/?user="+object.firstNmeInput +" "+ object.lastNmeInput);
+    });
+    console.log(JSON.stringify(req.body)+" ");
+  }
+app.post('/createEvent',[
   check('eventName','Event cannot be empty').exists().isLength({min:1}),
   check('contactEmail','Email is invalid').isEmail().normalizeEmail(),
   check('eventDescription','Description cannot be empty').exists().isLength({min:1}),
@@ -190,8 +219,6 @@ app.post('/createEvent',[
       })
     }
     else{
-
-    
     var object = req.body;
     var sql = ``; // add later, need to see the final database
     connection.query(sql, function (err, result) {
