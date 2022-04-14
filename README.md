@@ -1,1 +1,1 @@
-A web application that manange events on university website
+A web application that manage events on university website
