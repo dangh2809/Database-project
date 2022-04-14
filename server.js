@@ -71,6 +71,7 @@ app.post('/loginProcess',[
       {alert: dalert})
       }
     });
+
   }
 });
 app.post('/SignUp',(req,res)=>{
@@ -292,6 +293,5 @@ console.log( arrayOFEvents)
 
 const port = process.env.PORT||3000
 app.listen(port,()=>{
-    console.log(`Server Running on port ${port}...`)
+    console.log("Running...")
 });
-
