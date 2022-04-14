@@ -1,0 +1,189 @@
+:root {
+    --colorOne: #ffffff;
+    --colorTwo: #5c5c5c;
+    --colorWhite: #e5e5e5;
+  
+    --tileBorderRadius: 4px;
+
+    --fontOne: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+.btn-buy{
+    color: white;
+}
+
+.navbar{
+}
+.btnCloseMod{
+    position: absolute;
+    top: 7px;
+    right: 7px;
+}
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    background-color:  #25274d;
+}
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+.carousel-items{
+    
+}
+.divCar{
+    border-radius: 10px;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+}
+.bigImage{
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+.btn-nav{
+    background-color: white;
+    color: #25274d;
+    border-color: white;
+    margin-left:5px ;
+}
+
+.header {
+    padding: 0 2%;
+}
+.swiper-container {
+    width: 100%;
+    height: 100%;
+  }
+body {
+    font-family: var(--fontOne);
+    padding-bottom: 50px;
+}
+
+.headerLogo {
+    width: 180px;
+}
+
+.thumbSection {
+    padding-top: 3%;
+    color: var(--colorWhite);
+}
+
+.thumbTitle {
+    font-size: 22px;
+    padding-bottom: 5px;
+    line-height: 14px;
+    font-weight: 500;
+    margin: 0 4% 12px;
+}
+
+.thumbTiles.swiper-container {
+    display: flex;
+    padding: 0 4%;
+    align-items: center;}
+
+.thumbTile {
+    width: 20%;
+}
+
+.thumbTile__image {
+    width: 100%;
+    border-radius: var(--tileBorderRadius);
+}
+.cardStyle {
+display: flex;
+ 
+}
+
+/* .thumbTile:hover, .showDtlBtn {
+    display: block;
+} */
+.showDtlBtn{
+    width: 100%;
+    background-color: #2E9cca;
+}
+.modHeaderImg{
+    width: 100%;
+    flex: none;
+    border-top-left-radius:1% ;
+    border-top-right-radius: 1%;
+    height: 250px
+}
+
+.disabled {
+    pointer-events: none;
+    cursor: default;
+  }
+li {
+    list-style:none;
+}
+.block-test
+{
+    display: flex;
+    height: 50px;
+    width: 100%;
+    position: absolute;
+    right: 0;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;}
+
+ .swiper-button-prev,
+ .swiper-button-next {
+    position: 'absolute';
+    height: 50px;
+    width: 4%;
+    width: calc(4% - 5px);
+    top: 0;
+    bottom: 0;
+    margin: 0;
+    background-color: rgba(20, 20, 20, 0.5);
+}
+
+ .swiper-button-prev {
+    left: 0;
+    border-top-right-radius: var(--tileBorderRadius);
+    border-bottom-right-radius: var(--tileBorderRadius);
+}
+
+ .swiper-button-next {
+    right: 0;
+    border-top-left-radius: var(--tileBorderRadius);
+    border-bottom-left-radius: var(--tileBorderRadius);
+}
+
+ .swiper-button-prev::after,
+ .swiper-button-next::after {
+    color: #fff;
+    font-size: 4vw;
+    font-weight: bold;
+    transition: transform 0.1s ease-out;
+}
+.cardTitle{
+    width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: absolute;
+    color: white;
+    margin: 10px;}
+
+@media screen and (min-width: 640px) {
+     .swiper-button-prev::after,
+     .swiper-button-next::after {
+        display: none;
+        font-size: 2.4vw;
+    }
+
+     .swiper-button-prev:hover::after,
+     .swiper-button-next:hover::after {
+        transform: scale(1.25);
+    }
+
+    :hover .swiper-button-prev::after,
+    :hover .swiper-button-next::after {
+        display: block;
+    }
+
+}

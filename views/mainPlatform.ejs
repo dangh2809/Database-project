@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCF Theater</title>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="/public/css/mainStyleSheet.css">
+
+</head>
+
+<body>
+    
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container-md">
+              <a class="navbar-brand" href="">
+                <img src="/logo.png" style=" height: 50px;"/>
+              </a>
+                <div class="navbar-nav">
+                    
+                </div>
+              <% if(!userName){ %> 
+              <div class="d-flex"> 
+                <form action="/login" method="post">
+                  <button class="btn btn-nav btn-warning" type="submit" action="/login">Login</button>
+            </form>
+            <form action="/SignUp" method="post">
+              <button class="btn btn-nav btn-success" type="submit">Sign Up</button>
+            </form>
+            </div>
+            <%  }else{ %>
+                <div>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                       <%= userName %>  
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                          <li><a class="dropdown-item" href="">Profile</a></li>
+                          <li><a class="dropdown-item" href="">Tickets</a></li>
+                          <li><a class="dropdown-item" href="">Log Out</a></li>
+                        </ul>
+                      </li>
+                </div> 
+                <% } %> 
+            </div>
+          </nav>
+
+
+
+          <div>
+    <% for (const items in lists) { %> 
+        <section class="thumbSection">
+            <h2 class="thumbTitle"><%=items%></h2>
+            <div class="thumbTiles swiper-container">
+                
+                <!-- Additional required wrapper -->
+
+                <div class="swiper-wrapper">
+                    <!-- Slides -->
+                  
+                    <% for(const event in lists[items]){ %> 
+                            
+                        <div class="swiper-slide">
+                            <a class="thumbTile ">
+                                <div class="cardStyle">
+                                    <p class="cardTitle"> <%= lists[items][event].eventTitle%></p>
+                                <img class="thumbTile__image"
+                                    src="<%= lists[items][event]["eventImage"] %>" 
+                                    >
+                                    
+                            </div>
+                            <button data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="<%=JSON.stringify(lists[items][event])%>"  class=" showDtlBtn btn btn-primary" >Show Details</button>
+
+                            </a>
+
+                        </div>
+
+                        <% } %>                 
+                    </div>        
+                    <!-- If we need navigation buttons -->
+        <div class="block-test">
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+                               
+                </div>
+      
+                <!-- If we need navigation buttons -->
+
+         
+            </div>
+          
+
+        </section>
+        <%}%>
+</div>
+      
+
+
+        
+          
+          <!-- Modal -->
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header  p-0 ">
+                    <button type="button" class="btn-close btnCloseMod" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <img class="modHeaderImg" src="https://occ-0-1433-1432.1.nflxso.net/dnm/api/v6/X194eJsgWBDE2aQbaNdmCXGUP-Y/AAAABUjsKDiaKwLmrV662pwmVKEtRmbJI-s8M9ojCqr2QEdnPUJPX86RP-n9IGXxGcaHWkTf-cwz5e4kBLN3jYLM7HuBfYA.webp?r=01d">  
+                </div>
+                <div class="modal-body">
+                  <h4 class="modal-title"></h4>
+                  <div class="eventDetails m-2">
+                    <div class="d-flex">
+                        <i class="bi bi-calendar "></i> <p class="eventDate mx-3">   Friday, 03/15/2022</p>
+                    </div>
+                    <div class="d-flex">
+                        <i class="bi bi-clock "> </i><p class="eventTime mx-3">   1:00:00 PM</p>
+
+                    </div>
+                    <div class="d-flex">
+
+                    <i class="bi bi-currency-dollar"></i><p class="eventPrice mx-3">19.99</p>
+                    </div>
+                    <div class="d-flex">
+                      <i class="bi bi-heart-fill"></i><p class="eventRate mx-3">69</p>
+                      </div>
+                  </div>
+                  <p class="modal-descrip"> Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magni cupiditate, voluptatem incidunt facere velit excepturi ullam praesentium numquam quasi nisi quos, unde impedit libero dicta dolores esse voluptatum dolor amet animi vel? Nesciunt quas temporibus minima esse eveniet autem iure minus tempora quibusdam sint!</p>
+                </div>
+                <div class="modal-footer">
+                  <a type="button" class="btn btn-warning btn-buy btn-tick"><i class="bi bi-ticket-perforated"></i> Buy Tickets</a>
+                  <a class="btn btn-danger btn-buy btn-like"><i class="bi bi-heart"></i> Like</a>
+                </div>
+              </div>
+            </div>
+          </div>
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>  
+
+    <script>
+       var exampleModal = document.getElementById('exampleModal')
+        exampleModal.addEventListener('show.bs.modal', function (event) {
+  // Button that triggered the modal
+  var button = event.relatedTarget
+  // Extract info from data-bs-* attributes
+  var recipient = button.getAttribute('data-bs-whatevert')
+
+  var eventObj = JSON.parse(button.getAttribute('data-bs-whatever'))
+  console.log(eventObj)
+  var modalTitle = exampleModal.querySelector('.modal-title')
+  var eventLink = exampleModal.querySelector('.btn-tick')
+  var modalImg = exampleModal.querySelector('.modHeaderImg')
+  var eventDecp = exampleModal.querySelector('.modal-descrip')
+  var eventPrice = exampleModal.querySelector('.eventPrice')
+  var eventtime = exampleModal.querySelector('.eventTime')          
+  var eventDate = exampleModal.querySelector('.eventDate')
+  var eventRate = exampleModal.querySelector('.eventRate')
+
+  modalImg.src = eventObj.eventImage
+  modalTitle.textContent = eventObj.eventTitle
+  eventDecp.textContent = eventObj.eventDecrip
+  eventDate.textContent = eventObj.eventDate
+  eventRate.textContent = eventObj.rate
+
+  eventtime.textContent = eventObj.eventTime
+  eventPrice.textContent = eventObj.price
+
+  
+
+  
+
+  eventLink.href = eventObj.eventLink
+
+})
+        var mySwiper = new Swiper('.swiper-container', {
+            // Optional parameters
+            spaceBetween: 5,
+            slidesPerView: 2,
+            loop: true,
+            freeMode: true,
+            loopAdditionalSlides: 5,
+            speed: 600,
+            // Navigation arrows
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            breakpoints: {
+                // when window width is >= 640px
+                640: {
+                    slidesPerView: 4,
+                    slidesPerGroup: 4,
+                    freeMode: false
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
