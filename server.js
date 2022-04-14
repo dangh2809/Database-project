@@ -75,6 +75,9 @@ app.post('/loginProcess',[
 });
 app.post('/SignUp',(req,res)=>{
     res.render('signUpPage');
+})
+app.get('/createEvent',(req,res)=>{
+  res.render('createEventPage');
 }) 
 app.get('/',(req,res)=>{
   if(req.query.user)
@@ -164,7 +167,39 @@ console.log(returnObject);
 
 
 }) 
+app.post('/createEvent',[
+  check('eventName','Event cannot be empty').exists().isLength({min:1}),
+  check('contactEmail','Email is invalid').isEmail().normalizeEmail(),
+  check('eventDescription','Description cannot be empty').exists().isLength({min:1}),
+  check('xCoordinate','X-coordinate cannot be empty').exists().isLength({min:1}),
+  check('yCoordinate','Y-coordinate cannot be empty').exists().isLength({min:1}),,
+  check('eventCat','Category cannot be empty').exists().isLength({min:1}),
+  check('eventDate','Please specify date for the event').exists().isLength({min:1}),
+  check('eventTime','Please specify time for the event').exists().isLength({min:1}),
+  check('contactPhoneNumber', 'Please insert contact phone number').exists().isLength({min:1})
+  
+], function(req, res){ // Specifies which URL to listen for
+    // req.body -- contains form data
 
+    const error= validationResult(req)
+    if(!error.isEmpty())
+    {
+      const alert = error.array()
+      res.render('createEventPae',{
+        alert
+      })
+    }
+    else{
+
+    
+    var object = req.body;
+    var sql = ``; // add later, need to see the final database
+    connection.query(sql, function (err, result) {
+      if (err) throw err;
+      res.redirect("/?user="+object.firstNmeInput +" "+ object.lastNmeInput);
+    });
+    console.log(JSON.stringify(req.body)+" ");
+  }
 app.post('/signUpProcess',[
   check('passwordInput','Pasword must be 8+ characters long').exists().isLength({min:8}),
   check('emailInput','Email is invalid').isEmail().normalizeEmail(),
