@@ -96,7 +96,7 @@ app.get('/',(req,res)=>{
  
  var returnObject ={}
   var arrayOFEvents =[]
-
+//HELLOOO
   connection.query(publicSql, function (err, result) {
     var results= JSON.parse(JSON.stringify(result))
     var dat ,time,eventTime=''
