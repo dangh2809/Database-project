@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 require('dotenv').config()
 const {check,validationResult}=require('express-validator')
 var mysql=require('mysql');
+const { system } = require('nodemon/lib/config')
  var connection=mysql.createConnection({
    host:process.env.HOST_NAME,
    user:process.env.DB_USERNAME,
@@ -57,11 +58,13 @@ app.post('/loginProcess',[
     var object = req.body;
     var sql = "Select firstname,lastname,userID from USERS where email='"+object.emailInput+"'AND userPassword='"+object.passwordInput+"'";
     connection.query(sql, function (err, result) {
+      var results= JSON.parse(JSON.stringify(result))
+
       if (err) throw err;
-        console.log(result); 
-      if(result[0])
+        console.log(results+"HELLOOOOO"); 
+      if(results)
       {
-     res.redirect("/?user="+ result[0]["firstname"] +" "+ result[0]["lastname"]+" "+result[0]["userID"]);
+     res.redirect("/?user="+results[0].userID);
       }
       else
       {
@@ -76,23 +79,20 @@ app.post('/loginProcess',[
 });
 app.post('/SignUp',(req,res)=>{
     res.render('signUpPage');
+})
+app.get('/createEvent',(req,res)=>{
+  console.log("HEllo")
+  res.render('createEventPage');
+}) 
+app.get('/createRSO',(req,res)=>{
+  res.render('createRSOPage');
 }) 
 app.get('/',(req,res)=>{
-  if(req.query.user)
-  {
-  var userSQL ="Select * from users where userID="+req.query.user;
-  connection.query(userSQL, function (err, result) {
-    var private ="Select uniID from studentinuniversity where studentID="+req.query.user;
-    var privatecSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=2 and uniID ="+req.query.user;
-
-  
-  
-  });
-  }
+ 
 
   //var trendSQL = "Select * from CREATOR_EVENT ORDER BY ratingCount DESC LIMIT 10;";
   //Public
- var publicSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=1";
+ var publicSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=4";
  //Private 
  
  var returnObject ={}
@@ -120,8 +120,54 @@ app.get('/',(req,res)=>{
   });
 returnObject["Public"] = arrayOFEvents;
 console.log(returnObject);
-arrayOFEvents =[]
-res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+if(req.query.user)
+{
+var userSQL ="Select * from users where userID="+req.query.user;
+connection.query(userSQL, function (err, result) {
+  if(err)
+  {    res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+}
+  //var private ="Select uniID from studentinuniversity where studentID="+req.query.user;
+  var results= JSON.parse(JSON.stringify(result))
+  console.log(results)
+  console.log(results[0].univeristyID)
+  arrayOFEvents =[]
+  if(results[0].univeristyID)
+  {
+    var privateSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=14 and uniID ="+results[0].univeristyID;
+    console.log(privateSql)
+      connection.query(privateSql, function (err, result2) {
+        
+        var results= JSON.parse(JSON.stringify(result2))
+        var dat ,time,eventTime=''
+        results.forEach(element => {
+            //NOTE SAVE DATE AS UTC
+             dat=element.eventdate;
+            dat =new Date(dat).toLocaleString('en', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+            });
+            console.log(element.eventdate)
+             time= element.eventTime;
+        arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat })
+            
+      });
+    returnObject["Private"] = arrayOFEvents; 
+    res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+
+    });
+  }
+  else{
+    res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+  }
+});
+}
+else
+{
+  res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+
+}
 });
 
 //   connection.query(sql, function (err, result) {
@@ -169,7 +215,63 @@ console.log(returnObject);
 
 
 }) 
+// app.post('/createRSO',[
+//   check('rsoName','Event cannot be empty').exists().isLength({min:1}),
+//   check('rsoDescription','Description cannot be empty').exists().isLength({min:1}),
+  
+// ], function(req, res){ // Specifies which URL to listen for
+//     // req.body -- contains form data
 
+//     const error= validationResult(req)
+//     if(!error.isEmpty())
+//     {
+//       const alert = error.array()
+//       res.render('createRSOPage',{
+//         alert
+//       })
+//     }
+//     else{
+
+    
+//     var object = req.body;
+//     var sql = ``; // add later, need to see the final database
+//     connection.query(sql, function (err, result) {
+//       if (err) throw err;
+//       res.redirect("/?user="+object.firstNmeInput +" "+ object.lastNmeInput);
+//     });
+//     console.log(JSON.stringify(req.body)+" ");
+//   }
+// app.post('/createEvent',[
+//   check('eventName','Event cannot be empty').exists().isLength({min:1}),
+//   check('contactEmail','Email is invalid').isEmail().normalizeEmail(),
+//   check('eventDescription','Description cannot be empty').exists().isLength({min:1}),
+//   check('xCoordinate','X-coordinate cannot be empty').exists().isLength({min:1}),
+//   check('yCoordinate','Y-coordinate cannot be empty').exists().isLength({min:1}),,
+//   check('eventCat','Category cannot be empty').exists().isLength({min:1}),
+//   check('eventDate','Please specify date for the event').exists().isLength({min:1}),
+//   check('eventTime','Please specify time for the event').exists().isLength({min:1}),
+//   check('contactPhoneNumber', 'Please insert contact phone number').exists().isLength({min:1})
+  
+// ], function(req, res){ // Specifies which URL to listen for
+//     // req.body -- contains form data
+
+//     const error= validationResult(req)
+//     if(!error.isEmpty())
+//     {
+//       const alert = error.array()
+//       res.render('createEventPage',{
+//         alert
+//       })
+//     }
+//     else{
+//     var object = req.body;
+//     var sql = ``; // add later, need to see the final database
+//     connection.query(sql, function (err, result) {
+//       if (err) throw err;
+//       res.redirect("/?user="+object.firstNmeInput +" "+ object.lastNmeInput);
+//     });
+//     console.log(JSON.stringify(req.body)+" ");
+//   }
 app.post('/signUpProcess',[
   check('passwordInput','Pasword must be 8+ characters long').exists().isLength({min:8}),
   check('emailInput','Email is invalid').isEmail().normalizeEmail(),
@@ -190,11 +292,19 @@ app.post('/signUpProcess',[
 
     
     var object = req.body;
-    var sql = "insert into users(firstname,lastname,email,userPassword,userType) Values ('"+object.firstNmeInput+"','"+object.lastNmeInput+"','"+object.emailInput+"','"+object.passwordInput+"',3)";
+    var sql = "insert into users(firstname,lastname,email,userPassword,userType) Values ('"+object.firstNmeInput+"','"+object.lastNmeInput+"','"+object.emailInput+"','"+object.passwordInput+"',24)";
     connection.query(sql, function (err, result) {
       if (err) throw err;
-      res.redirect("/?user="+object.firstNmeInput +" "+ object.lastNmeInput);
-
+      var sql = "Select firstname,lastname,userID from USERS where email='"+object.emailInput+"'AND userPassword='"+object.passwordInput+"'";
+      connection.query(sql, function (err, result) {
+        var results= JSON.parse(JSON.stringify(result))
+  
+        if (err) throw err;
+          console.log(results+"HELLOOOOO"); 
+        if(results)
+        {
+       res.redirect("/?user="+results[0].userID);
+        }});
     });
     console.log(JSON.stringify(req.body)+" ");
   }
@@ -235,12 +345,5 @@ console.log( arrayOFEvents)
 
 const port = process.env.PORT||3000
 app.listen(port,()=>{
-<<<<<<< HEAD
-    console.log("Running...")
-});
-=======
     console.log("Server Running...")
 });
-
-//HELLO
->>>>>>> 12d654e22b6b98dcc3fbb2dbcfb51014b9085660
