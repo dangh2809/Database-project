@@ -23,7 +23,7 @@
           <%  })} %> 
           <div>
 
-            <form method="post" action="/createEvent?user">
+            <form method="post" action="/createEvent?user?=<%=userName%>">
                 
                 <div class="form-group">
                   <label for="eventName">Title</label>
@@ -36,9 +36,9 @@
                 <div class="form-group">
                   <label for="eventType">Event Type</label>
                   <select id="eventType">
-                    <option value="public">public</option>
-                    <option value="private">private</option>
-                    <option value="RSO">RSO</option>
+                    <option value="4">public</option>
+                    <option value="14">private</option>
+                    <option value="24">RSO</option>
                   </select>
                 </div>
                 <label for="locationCoord">Location</label>

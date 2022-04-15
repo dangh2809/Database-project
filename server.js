@@ -82,8 +82,7 @@ app.post('/SignUp',(req,res)=>{
     res.render('signUpPage');
 })
 app.get('/createEvent',(req,res)=>{
-  console.log("HEllo")
-  res.render('createEventPage', );
+  res.render('createEventPage', {userName:req.query.user});
 }) 
 app.get('/createRSO',(req,res)=>{
   res.render('createRSOPage',{userName:req.query.user});
@@ -260,38 +259,7 @@ app.post('/createRSO', [
     }
 
 })
-// app.post('/createRSO',[
-//   check('rsoName','Event cannot be empty').exists().isLength({min:1}),
-//   check('rsoDescription','Description cannot be empty').exists().isLength({min:1}),
-//   ], function(req, res){ // Specifies which URL to listen for
-//     // req.body -- contains form data
 
-//     const error= validationResult(req)
-//     if(!error.isEmpty())
-//     {
-//       const alert = error.array()
-//       res.render('createRSOPage',{
-//         alert
-//       })
-//     }
-//     else{
-
-    
-//     var object = req.body;
-//     var sql = "Select universityID from rso where adminId="+object.userID; // add later, need to see the final database
-//     if (req.query.userId)
-//     connection.query(userSQL, function (err, result) {
-//       if(err)
-//       {    res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
-//       }
-//       //var private ="Select uniID from studentinuniversity where studentID="+req.query.user;
-//       var results= JSON.parse(JSON.stringify(result))
-//       console.log(results)
-//       console.log(results[0].univeristyID)
-//       arrayOFEvents =[]
-//       console.log(JSON.stringify(req.body)+" ");
-//     })
-// };
 // app.post('/createEvent',[
 //   check('eventName','Event cannot be empty').exists().isLength({min:1}),
 //   check('contactEmail','Email is invalid').isEmail().normalizeEmail(),
@@ -306,22 +274,51 @@ app.post('/createRSO', [
 // ], function(req, res){ // Specifies which URL to listen for
 //     // req.body -- contains form data
 
+//     console.log(req.query.user);
 //     const error= validationResult(req)
 //     if(!error.isEmpty())
 //     {
 //       const alert = error.array()
-//       res.render('createEventPage',{
+//       res.render('createRSOPage',{
 //         alert
 //       })
+//       console.log("error")
+//     } else{
+//       if(req.query.user){
+//         let object= req.body;
+//         let locationSQL = `select locationID from location where locationX=${object.xCoordinate} and locationY=${object.yCoordinate}`;
+//         connection.query(locationSQL, function (err, result){
+//           if (err){
+//             console.log("error in unisql");
+//             throw err;
+//           } 
+//           else {
+//             let results= JSON.parse(JSON.stringify(result))
+            
+//             console.log(object);
+//             if (object.eventType == 'RSO') {
+//               // if user make a public RSO must request from super admin
+//             }
+//             else {
+//               let eventSQL = `insert into unievents(uniID, eventType, eventName, eventDescrip, eventLocation, eventDate, eventPhone, eventEmail, eventTime, eventcategory ) values (${req.query.user},${object.rsoName},${object.rsoDescription}, ${results[0].univeristyID},0,1`;
+//             connection.query(eventSQL, function(err, result){
+//               if (err){
+//                 console.log("error in eventSQL");
+//                 throw err;
+//               } 
+//               else {
+//                 res.redirect(`/?user=${req.body.user}`);
+//               }
+//             })
+//             }
+            
+//           }
+
+//         })
+//       } else {
+//         console.log("query not found")
+//       }
 //     }
-//     else{
-//     var object = req.body;
-//     var sql = ``; // add later, need to see the final database
-//     connection.query(sql, function (err, result) {
-//       if (err) throw err;
-//       res.redirect("/?user="+object.firstNmeInput +" "+ object.lastNmeInput);
-//     });
-//     console.log(JSON.stringify(req.body)+" ");
 //   }
 app.post('/signUpProcess',[
   check('passwordInput','Pasword must be 8+ characters long').exists().isLength({min:8}),
