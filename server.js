@@ -6,11 +6,7 @@ require('dotenv').config()
 const {check,validationResult}=require('express-validator')
 var mysql=require('mysql');
 const { system } = require('nodemon/lib/config')
-<<<<<<< HEAD
-const { rmSync } = require('fs')
-=======
 const { resetWatchers } = require('nodemon/lib/monitor/watch')
->>>>>>> main
  var connection=mysql.createConnection({
    host:process.env.HOST_NAME,
    user:process.env.DB_USERNAME,
