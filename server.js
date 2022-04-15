@@ -76,20 +76,15 @@ app.post('/loginProcess',[
 });
 app.post('/SignUp',(req,res)=>{
     res.render('signUpPage');
-})
-app.get('/createEvent',(req,res)=>{
-  res.render('createEventPage');
-}) 
-app.get('/createRSO',(req,res)=>{
-  res.render('createRSOPage');
 }) 
 app.get('/',(req,res)=>{
   if(req.query.user)
   {
   var userSQL ="Select * from users where userID="+req.query.user;
-  connection.query(publicSql, function (err, result) {
-    var uniSQL ="Select uniID from studentinuniversity where studentID="+req.query.user;
-  
+  connection.query(userSQL, function (err, result) {
+    var private ="Select uniID from studentinuniversity where studentID="+req.query.user;
+    var privatecSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=2 and uniID ="+req.query.user;
+
   
   
   });
@@ -99,7 +94,6 @@ app.get('/',(req,res)=>{
   //Public
  var publicSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=1";
  //Private 
- var privatecSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=2";
  
  var returnObject ={}
   var arrayOFEvents =[]
@@ -118,12 +112,16 @@ app.get('/',(req,res)=>{
         console.log(element.eventdate)
          time= element.eventTime;
     arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat })
-});
+
+
+
+
+
+  });
 returnObject["Public"] = arrayOFEvents;
 console.log(returnObject);
 arrayOFEvents =[]
 res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
-
 });
 
 //   connection.query(sql, function (err, result) {
@@ -171,63 +169,7 @@ console.log(returnObject);
 
 
 }) 
-app.post('/createEvent',[
-  check('rsoName','Event cannot be empty').exists().isLength({min:1}),
-  check('rsoDescription','Description cannot be empty').exists().isLength({min:1}),
-  
-], function(req, res){ // Specifies which URL to listen for
-    // req.body -- contains form data
 
-    const error= validationResult(req)
-    if(!error.isEmpty())
-    {
-      const alert = error.array()
-      res.render('createRSO',{
-        alert
-      })
-    }
-    else{
-
-    
-    var object = req.body;
-    var sql = ``; // add later, need to see the final database
-    connection.query(sql, function (err, result) {
-      if (err) throw err;
-      res.redirect("/?user="+object.firstNmeInput +" "+ object.lastNmeInput);
-    });
-    console.log(JSON.stringify(req.body)+" ");
-  }
-app.post('/createEvent',[
-  check('eventName','Event cannot be empty').exists().isLength({min:1}),
-  check('contactEmail','Email is invalid').isEmail().normalizeEmail(),
-  check('eventDescription','Description cannot be empty').exists().isLength({min:1}),
-  check('xCoordinate','X-coordinate cannot be empty').exists().isLength({min:1}),
-  check('yCoordinate','Y-coordinate cannot be empty').exists().isLength({min:1}),,
-  check('eventCat','Category cannot be empty').exists().isLength({min:1}),
-  check('eventDate','Please specify date for the event').exists().isLength({min:1}),
-  check('eventTime','Please specify time for the event').exists().isLength({min:1}),
-  check('contactPhoneNumber', 'Please insert contact phone number').exists().isLength({min:1})
-  
-], function(req, res){ // Specifies which URL to listen for
-    // req.body -- contains form data
-
-    const error= validationResult(req)
-    if(!error.isEmpty())
-    {
-      const alert = error.array()
-      res.render('createEventPae',{
-        alert
-      })
-    }
-    else{
-    var object = req.body;
-    var sql = ``; // add later, need to see the final database
-    connection.query(sql, function (err, result) {
-      if (err) throw err;
-      res.redirect("/?user="+object.firstNmeInput +" "+ object.lastNmeInput);
-    });
-    console.log(JSON.stringify(req.body)+" ");
-  }
 app.post('/signUpProcess',[
   check('passwordInput','Pasword must be 8+ characters long').exists().isLength({min:8}),
   check('emailInput','Email is invalid').isEmail().normalizeEmail(),
@@ -293,5 +235,12 @@ console.log( arrayOFEvents)
 
 const port = process.env.PORT||3000
 app.listen(port,()=>{
+<<<<<<< HEAD
     console.log("Running...")
 });
+=======
+    console.log("Server Running...")
+});
+
+//HELLO
+>>>>>>> 12d654e22b6b98dcc3fbb2dbcfb51014b9085660
