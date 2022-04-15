@@ -6,6 +6,7 @@ require('dotenv').config()
 const {check,validationResult}=require('express-validator')
 var mysql=require('mysql');
 const { system } = require('nodemon/lib/config')
+const { rmSync } = require('fs')
  var connection=mysql.createConnection({
    host:process.env.HOST_NAME,
    user:process.env.DB_USERNAME,
@@ -82,10 +83,10 @@ app.post('/SignUp',(req,res)=>{
 })
 app.get('/createEvent',(req,res)=>{
   console.log("HEllo")
-  res.render('createEventPage');
+  res.render('createEventPage', );
 }) 
 app.get('/createRSO',(req,res)=>{
-  res.render('createRSOPage');
+  res.render('createRSOPage',{userName:req.query.user});
 }) 
 app.get('/',(req,res)=>{
  
@@ -215,11 +216,54 @@ console.log(returnObject);
 
 
 }) 
+app.post('/createRSO', [
+  check('rsoName','Event cannot be empty').exists().isLength({min:1}),
+  check('rsoDescription','Description cannot be empty').exists().isLength({min:1})
+], function(req, res) {
+    console.log(req.query.user);
+    const error= validationResult(req)
+    if(!error.isEmpty())
+    {
+      const alert = error.array()
+      res.render('createRSOPage',{
+        alert
+      })
+      console.log("error")
+    } else{
+      if(req.query.user){
+        let unisql = `select univeristyID from users where userID=${req.query.user}`;
+        connection.query(unisql, function (err, result){
+          if (err){
+            console.log("error in unisql");
+            throw err;
+          } 
+          else {
+            let results= JSON.parse(JSON.stringify(result))
+            let object= req.body;
+            console.log(object);
+            let rsosql = `insert into rso(adminId, RSOName, RSODescrip, universityID, RSOstatus, numberOfStudents) values (${req.query.user},${object.rsoName},${object.rsoDescription}, ${results[0].univeristyID},0,1`;
+            connection.query(rsosql, function(err, result){
+              if (err){
+                console.log("error in rsosql");
+                throw err;
+              } 
+              else {
+                res.redirect(`/?user=${req.body.user}`);
+              }
+            })
+          }
+
+        })
+      } else {
+        console.log("query not found")
+      }
+    }
+
+})
 // app.post('/createRSO',[
 //   check('rsoName','Event cannot be empty').exists().isLength({min:1}),
 //   check('rsoDescription','Description cannot be empty').exists().isLength({min:1}),
-  
-// ], function(req, res){ // Specifies which URL to listen for
+//   ], function(req, res){ // Specifies which URL to listen for
 //     // req.body -- contains form data
 
 //     const error= validationResult(req)
@@ -234,13 +278,20 @@ console.log(returnObject);
 
     
 //     var object = req.body;
-//     var sql = ``; // add later, need to see the final database
-//     connection.query(sql, function (err, result) {
-//       if (err) throw err;
-//       res.redirect("/?user="+object.firstNmeInput +" "+ object.lastNmeInput);
-//     });
-//     console.log(JSON.stringify(req.body)+" ");
-//   }
+//     var sql = "Select universityID from rso where adminId="+object.userID; // add later, need to see the final database
+//     if (req.query.userId)
+//     connection.query(userSQL, function (err, result) {
+//       if(err)
+//       {    res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+//       }
+//       //var private ="Select uniID from studentinuniversity where studentID="+req.query.user;
+//       var results= JSON.parse(JSON.stringify(result))
+//       console.log(results)
+//       console.log(results[0].univeristyID)
+//       arrayOFEvents =[]
+//       console.log(JSON.stringify(req.body)+" ");
+//     })
+// };
 // app.post('/createEvent',[
 //   check('eventName','Event cannot be empty').exists().isLength({min:1}),
 //   check('contactEmail','Email is invalid').isEmail().normalizeEmail(),
@@ -278,8 +329,7 @@ app.post('/signUpProcess',[
   check('firstNmeInput','First Name cannot be empty').exists().isLength({min:1}),
   check('lastNmeInput','Last Name cannot be empty').exists().isLength({min:1})
 ], function(req, res){ // Specifies which URL to listen for
-    // req.body -- contains form data
-
+    // req.body -- contains form datass
     const error= validationResult(req)
     if(!error.isEmpty())
     {
