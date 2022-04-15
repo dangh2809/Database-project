@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 require('dotenv').config()
 const {check,validationResult}=require('express-validator')
 var mysql=require('mysql');
+const { system } = require('nodemon/lib/config')
  var connection=mysql.createConnection({
    host:process.env.HOST_NAME,
    user:process.env.DB_USERNAME,
@@ -81,8 +82,12 @@ app.get('/',(req,res)=>{
   {
   var userSQL ="Select * from users where userID="+req.query.user;
   connection.query(userSQL, function (err, result) {
-    var private ="Select uniID from studentinuniversity where studentID="+req.query.user;
-    var privatecSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=2 and uniID ="+req.query.user;
+    //var private ="Select uniID from studentinuniversity where studentID="+req.query.user;
+    var results= JSON.parse(JSON.stringify(result))
+
+    console.log(result[0].univeristyID)
+    var privateSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=14 and uniID ="+req.result[0].univeristyID;
+    console.log(privateSql)
 
   
   
@@ -91,7 +96,7 @@ app.get('/',(req,res)=>{
 
   //var trendSQL = "Select * from CREATOR_EVENT ORDER BY ratingCount DESC LIMIT 10;";
   //Public
- var publicSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=1";
+ var publicSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=4";
  //Private 
  
  var returnObject ={}
@@ -189,7 +194,7 @@ app.post('/signUpProcess',[
 
     
     var object = req.body;
-    var sql = "insert into users(firstname,lastname,email,userPassword,userType) Values ('"+object.firstNmeInput+"','"+object.lastNmeInput+"','"+object.emailInput+"','"+object.passwordInput+"',3)";
+    var sql = "insert into users(firstname,lastname,email,userPassword,userType) Values ('"+object.firstNmeInput+"','"+object.lastNmeInput+"','"+object.emailInput+"','"+object.passwordInput+"',24)";
     connection.query(sql, function (err, result) {
       if (err) throw err;
       res.redirect("/?user="+object.firstNmeInput +" "+ object.lastNmeInput);
