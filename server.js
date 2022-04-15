@@ -80,9 +80,10 @@ app.get('/',(req,res)=>{
   if(req.query.user)
   {
   var userSQL ="Select * from users where userID="+req.query.user;
-  connection.query(publicSql, function (err, result) {
-    var uniSQL ="Select uniID from studentinuniversity where studentID="+req.query.user;
-  
+  connection.query(userSQL, function (err, result) {
+    var private ="Select uniID from studentinuniversity where studentID="+req.query.user;
+    var privatecSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=2 and uniID ="+req.query.user;
+
   
   
   });
@@ -92,7 +93,6 @@ app.get('/',(req,res)=>{
   //Public
  var publicSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=1";
  //Private 
- var privatecSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=2";
  
  var returnObject ={}
   var arrayOFEvents =[]
@@ -111,12 +111,16 @@ app.get('/',(req,res)=>{
         console.log(element.eventdate)
          time= element.eventTime;
     arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat })
-});
+
+
+
+
+
+  });
 returnObject["Public"] = arrayOFEvents;
 console.log(returnObject);
 arrayOFEvents =[]
 res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
-
 });
 
 //   connection.query(sql, function (err, result) {
