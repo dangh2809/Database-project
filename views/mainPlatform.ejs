@@ -72,7 +72,7 @@
                                 <div class="cardStyle">
                                     <p class="cardTitle"> <%= lists[items][event].eventTitle%></p>
                                 <img class="thumbTile__image"
-                                    src="<%= lists[items][event]["eventImage"] %>" 
+                                    src="https://media.istockphoto.com/photos/liquid-shapes-abstract-holographic-3d-wavy-background-picture-id1038727610?k=20&m=1038727610&s=612x612&w=0&h=jtpP1B4mFWcv6OPE2kiwJCOCrj9H0hQ1DSCfNT07b5o="
                                     >
                                     
                             </div>
@@ -161,22 +161,14 @@
   var eventtime = exampleModal.querySelector('.eventTime')          
   var eventDate = exampleModal.querySelector('.eventDate')
   var eventRate = exampleModal.querySelector('.eventRate')
-
   modalImg.src = eventObj.eventImage
   modalTitle.textContent = eventObj.eventTitle
   eventDecp.textContent = eventObj.eventDecrip
   eventDate.textContent = eventObj.eventDate
   eventRate.textContent = eventObj.rate
-
   eventtime.textContent = eventObj.eventTime
   eventPrice.textContent = eventObj.price
-
-  
-
-  
-
-  eventLink.href = eventObj.eventLink
-
+  eventLink.href = "/event?user=<%=userName%>"+"&event="+eventObj.eventID;
 })
         var mySwiper = new Swiper('.swiper-container', {
             // Optional parameters

@@ -6,7 +6,11 @@ require('dotenv').config()
 const {check,validationResult}=require('express-validator')
 var mysql=require('mysql');
 const { system } = require('nodemon/lib/config')
+<<<<<<< HEAD
 const { rmSync } = require('fs')
+=======
+const { resetWatchers } = require('nodemon/lib/monitor/watch')
+>>>>>>> main
  var connection=mysql.createConnection({
    host:process.env.HOST_NAME,
    user:process.env.DB_USERNAME,
@@ -81,6 +85,9 @@ app.post('/loginProcess',[
 app.post('/SignUp',(req,res)=>{
     res.render('signUpPage');
 })
+app.get('/event',(req,res)=>{
+  res.render('eventPage');
+})
 app.get('/createEvent',(req,res)=>{
   res.render('createEventPage', {userName:req.query.user});
 }) 
@@ -111,7 +118,7 @@ app.get('/',(req,res)=>{
         });
         console.log(element.eventdate)
          time= element.eventTime;
-    arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat })
+    arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat,"eventID":element.eventId })
 
 
 
@@ -150,11 +157,59 @@ connection.query(userSQL, function (err, result) {
             });
             console.log(element.eventdate)
              time= element.eventTime;
-        arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat })
+        arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat ,"eventID":element.eventId})
             
       });
     returnObject["Private"] = arrayOFEvents; 
-    res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+    var RSOsql="SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip,c.RSOName FROM uniEvents e INNER JOIN (SELECT r.RSOID,r.RSOName FROM userrso ur inner join rso r on ur.RSOID= r.RSOID where userID="+req.query.user+") c on e.RSOId=c.RSOID GROUP BY e.RSOId;"
+    console.log(RSOsql)
+    connection.query(RSOsql, function (err, result) {
+      arrayOFEvents =[]
+
+          var results= JSON.parse(JSON.stringify(result))
+          console.log(JSON.stringify(result));
+          if(result)
+          {
+          var curCat = result[0].RSOName
+          }
+          var dat ,time,eventTime=''
+          results.forEach(element => {
+            if(curCat == element.RSOName)
+            {
+              //NOTE SAVE DATE AS UTC
+               dat=element.eventdate;
+              dat =new Date(dat).toLocaleString('en', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              });
+               time=new Date(dat).toLocaleTimeString();
+              eventTime= time
+              arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":eventTime,"eventDate":dat ,"eventID":element.eventId })
+              console.log( arrayOFEvents)
+            }
+            else
+            {
+              returnObject[curCat] = arrayOFEvents;
+              arrayOFEvents=[];
+               dat=element.eventdate;
+              dat =new Date(dat).toLocaleString('en', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              });
+               time=new Date(dat).toLocaleTimeString();
+              eventTime= time
+              arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":eventTime,"eventDate":dat,"eventID":element.eventId  })
+              curCat=element.RSOName;
+            }
+          
+          });
+      
+          returnObject[curCat] = arrayOFEvents;
+          res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+
+        });
 
     });
   }
