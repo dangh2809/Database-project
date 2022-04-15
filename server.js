@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 require('dotenv').config()
 const {check,validationResult}=require('express-validator')
 var mysql=require('mysql');
+const { system } = require('nodemon/lib/config')
  var connection=mysql.createConnection({
    host:process.env.HOST_NAME,
    user:process.env.DB_USERNAME,
@@ -57,11 +58,13 @@ app.post('/loginProcess',[
     var object = req.body;
     var sql = "Select firstname,lastname,userID from USERS where email='"+object.emailInput+"'AND userPassword='"+object.passwordInput+"'";
     connection.query(sql, function (err, result) {
+      var results= JSON.parse(JSON.stringify(result))
+
       if (err) throw err;
-        console.log(result); 
-      if(result[0])
+        console.log(results+"HELLOOOOO"); 
+      if(results)
       {
-     res.redirect("/?user="+ result[0]["firstname"] +" "+ result[0]["lastname"]+" "+result[0]["userID"]);
+     res.redirect("/?user="+results[0].userID);
       }
       else
       {
@@ -88,9 +91,20 @@ app.get('/',(req,res)=>{
   if(req.query.user)
   {
   var userSQL ="Select * from users where userID="+req.query.user;
-  connection.query(publicSql, function (err, result) {
-    var uniSQL ="Select uniID from studentinuniversity where studentID="+req.query.user;
-  
+  connection.query(userSQL, function (err, result) {
+    //var private ="Select uniID from studentinuniversity where studentID="+req.query.user;
+    var results= JSON.parse(JSON.stringify(result))
+    console.log(results)
+    //console.log(result[0].univeristyID)
+    if(results[0].univeristyID)
+    {
+        var privateSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=14 and uniID ="+results[0].univeristyID;
+    
+    
+      }
+   
+        // console.log(privateSql)
+
   
   
   });
@@ -98,9 +112,8 @@ app.get('/',(req,res)=>{
 
   //var trendSQL = "Select * from CREATOR_EVENT ORDER BY ratingCount DESC LIMIT 10;";
   //Public
- var publicSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=1";
+ var publicSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=4";
  //Private 
- var privatecSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=2";
  
  var returnObject ={}
   var arrayOFEvents =[]
@@ -119,12 +132,16 @@ app.get('/',(req,res)=>{
         console.log(element.eventdate)
          time= element.eventTime;
     arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat })
-});
+
+
+
+
+
+  });
 returnObject["Public"] = arrayOFEvents;
 console.log(returnObject);
 arrayOFEvents =[]
 res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
-
 });
 
 //   connection.query(sql, function (err, result) {
@@ -249,7 +266,7 @@ app.post('/signUpProcess',[
 
     
     var object = req.body;
-    var sql = "insert into users(firstname,lastname,email,userPassword,userType) Values ('"+object.firstNmeInput+"','"+object.lastNmeInput+"','"+object.emailInput+"','"+object.passwordInput+"',4)";
+    var sql = "insert into users(firstname,lastname,email,userPassword,userType) Values ('"+object.firstNmeInput+"','"+object.lastNmeInput+"','"+object.emailInput+"','"+object.passwordInput+"',24)";
     connection.query(sql, function (err, result) {
       if (err) throw err;
       res.redirect("/?user="+object.firstNmeInput +" "+ object.lastNmeInput);
@@ -294,5 +311,7 @@ console.log( arrayOFEvents)
 
 const port = process.env.PORT||3000
 app.listen(port,()=>{
-    console.log("Running...")
+    console.log("Server Running...")
 });
+
+//HELLO
