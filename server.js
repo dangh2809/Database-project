@@ -82,7 +82,45 @@ app.post('/SignUp',(req,res)=>{
     res.render('signUpPage');
 })
 app.get('/event',(req,res)=>{
-  res.render('eventPage');
+  var eventSQL="Select * from unievents where eventID="+req.query.event;
+  console.log(eventSQL)
+  var returnObject={}
+  connection.query(eventSQL, function (err, result) {
+    var results= JSON.parse(JSON.stringify(result))
+    var dat ,time,eventTime=''
+    var arrayOFEvents=[]
+    console.log("pmsada"+results)
+    results.forEach(element => {
+        //NOTE SAVE DATE AS UTC
+         dat=element.eventdate;
+        dat =new Date(dat).toLocaleString('en', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        });
+
+        console.log(element.eventdate)
+         time= element.eventTime;
+    arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat,"eventID":element.eventId })
+  });
+returnObject["eventData"] = arrayOFEvents;
+var eventCommentSQL="select c.*,u.firstname,u.lastname from eventcomment c inner join users u on u.userID=c.userID  where eventID="+req.query.event+"  order by timeComment ;";
+  connection.query(eventCommentSQL, function (err, result) {
+    var arrayP=[{"comment":"WASSSSAP","Name":"ram","rating":"10"}];
+    console.log("JO:AAA")
+    var results= JSON.parse(JSON.stringify(result))
+    var dat ,time,eventTime=''
+    results.forEach(element => {
+    array.push({"comment":element.commentDescrip,"Name":element.firstname+" "+element.lastname,"rating":element.rating})
+    
+    });
+    returnObject["comment"] = arrayP;
+    console.log(returnObject["comment"])
+    res.render('eventPage',{data:returnObject,comment:arrayP});
+
+  });
+
+});
 })
 app.get('/createEvent',(req,res)=>{
   res.render('createEventPage', {userName:req.query.user});
