@@ -80,27 +80,7 @@ app.post('/SignUp',(req,res)=>{
     res.render('signUpPage');
 }) 
 app.get('/',(req,res)=>{
-  if(req.query.user)
-  {
-  var userSQL ="Select * from users where userID="+req.query.user;
-  connection.query(userSQL, function (err, result) {
-    //var private ="Select uniID from studentinuniversity where studentID="+req.query.user;
-    var results= JSON.parse(JSON.stringify(result))
-    console.log(results)
-    //console.log(result[0].univeristyID)
-    if(results[0].univeristyID)
-    {
-        var privateSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=14 and uniID ="+results[0].univeristyID;
-    
-    
-      }
-   
-        // console.log(privateSql)
-
-  
-  
-  });
-  }
+ 
 
   //var trendSQL = "Select * from CREATOR_EVENT ORDER BY ratingCount DESC LIMIT 10;";
   //Public
@@ -132,8 +112,54 @@ app.get('/',(req,res)=>{
   });
 returnObject["Public"] = arrayOFEvents;
 console.log(returnObject);
-arrayOFEvents =[]
-res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+if(req.query.user)
+{
+var userSQL ="Select * from users where userID="+req.query.user;
+connection.query(userSQL, function (err, result) {
+  if(err)
+  {    res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+}
+  //var private ="Select uniID from studentinuniversity where studentID="+req.query.user;
+  var results= JSON.parse(JSON.stringify(result))
+  console.log(results)
+  console.log(results[0].univeristyID)
+  arrayOFEvents =[]
+  if(results[0].univeristyID)
+  {
+    var privateSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=14 and uniID ="+results[0].univeristyID;
+    console.log(privateSql)
+      connection.query(privateSql, function (err, result2) {
+        
+        var results= JSON.parse(JSON.stringify(result2))
+        var dat ,time,eventTime=''
+        results.forEach(element => {
+            //NOTE SAVE DATE AS UTC
+             dat=element.eventdate;
+            dat =new Date(dat).toLocaleString('en', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+            });
+            console.log(element.eventdate)
+             time= element.eventTime;
+        arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat })
+            
+      });
+    returnObject["Private"] = arrayOFEvents;
+    res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+
+    });
+  }
+  else{
+    res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+  }
+});
+}
+else
+{
+  res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+
+}
 });
 
 //   connection.query(sql, function (err, result) {
@@ -205,8 +231,16 @@ app.post('/signUpProcess',[
     var sql = "insert into users(firstname,lastname,email,userPassword,userType) Values ('"+object.firstNmeInput+"','"+object.lastNmeInput+"','"+object.emailInput+"','"+object.passwordInput+"',24)";
     connection.query(sql, function (err, result) {
       if (err) throw err;
-      res.redirect("/?user="+object.firstNmeInput +" "+ object.lastNmeInput);
-
+      var sql = "Select firstname,lastname,userID from USERS where email='"+object.emailInput+"'AND userPassword='"+object.passwordInput+"'";
+      connection.query(sql, function (err, result) {
+        var results= JSON.parse(JSON.stringify(result))
+  
+        if (err) throw err;
+          console.log(results+"HELLOOOOO"); 
+        if(results)
+        {
+       res.redirect("/?user="+results[0].userID);
+        }});
     });
     console.log(JSON.stringify(req.body)+" ");
   }
