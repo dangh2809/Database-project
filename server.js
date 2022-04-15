@@ -145,7 +145,7 @@ connection.query(userSQL, function (err, result) {
         arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat })
             
       });
-    returnObject["Private"] = arrayOFEvents;
+    returnObject["Private"] = arrayOFEvents; 
     res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
 
     });
