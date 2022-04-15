@@ -58,11 +58,13 @@ app.post('/loginProcess',[
     var object = req.body;
     var sql = "Select firstname,lastname,userID from USERS where email='"+object.emailInput+"'AND userPassword='"+object.passwordInput+"'";
     connection.query(sql, function (err, result) {
+      var results= JSON.parse(JSON.stringify(result))
+
       if (err) throw err;
-        console.log(result); 
-      if(result[0])
+        console.log(results+"HELLOOOOO"); 
+      if(results)
       {
-     res.redirect("/?user="+ result[0]["firstname"] +" "+ result[0]["lastname"]+" "+result[0]["userID"]);
+     res.redirect("/?user="+results[0].userID);
       }
       else
       {
@@ -84,10 +86,16 @@ app.get('/',(req,res)=>{
   connection.query(userSQL, function (err, result) {
     //var private ="Select uniID from studentinuniversity where studentID="+req.query.user;
     var results= JSON.parse(JSON.stringify(result))
-
-    console.log(result[0].univeristyID)
-    var privateSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=14 and uniID ="+req.result[0].univeristyID;
-    console.log(privateSql)
+    console.log(results)
+    //console.log(result[0].univeristyID)
+    if(results[0].univeristyID)
+    {
+        var privateSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=14 and uniID ="+results[0].univeristyID;
+    
+    
+      }
+   
+        // console.log(privateSql)
 
   
   
