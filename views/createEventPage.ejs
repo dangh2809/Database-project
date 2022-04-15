@@ -1,5 +1,3 @@
-
-   
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,13 +33,12 @@
                   <label for="eventDescription">Description</label>
                   <input type="text" class="form-control" id="eventDescription" name="eventDescription" placeholder="Event's Description">
                 </div>
-                <div class="d-flex flex-row">
+                <label for="locationCoord">Location</label>
+                <div class="d-flex flex-row locationCoord">
                     <div class="form-group">
-                    <label for="xCoordinate">X coordinate</label>
                     <input type="text" class="form-control" id="xCoordinate" name="xCoordinate" placeholder="X Coordinate">
                   </div>
                   <div class="form-group">
-                    <label for="yCoordinate">Y coordinate</label>
                     <input type="text" class="form-control" id="yCoordinate" name="yCoordinate" placeholder="Y Coordinate">
                   </div>
                 </div>
@@ -57,6 +54,16 @@
                     <label for="eventCat">Category</label>
                     <input type="text" class="form-control" id="eventCat" name="eventCat" placeholder="Event's Category">
                 </div>
+            
+                    <div class="form-group">
+                    <label for="contactEmail">Contact Email</label>
+                    <input type="email" class="form-control" id="contactEmail" name="contactEmail" placeholder="Contact Email">
+                  </div>
+                  <div class="form-group">
+                    <label for="contactPhoneNumber">Contact Phone Number</label>
+                    <input type="text" class="form-control" id="contactPhoneNumber" name="contactPhoneNumber" placeholder="Contact Phone Number">
+                  </div>
+
                 <button type="submit" class="btn btn-primary">Create</button>
               </form>
             </div>

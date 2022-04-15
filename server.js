@@ -77,12 +77,13 @@ app.post('/loginProcess',[
 app.post('/SignUp',(req,res)=>{
     res.render('signUpPage');
 })
-// app.get('/createEvent',(req,res)=>{
-//   res.render('createEventPage');
-// }) 
-// app.get('/createRSO',(req,res)=>{
-//   res.render('createRSOPage');
-// }) 
+app.get('/createEvent',(req,res)=>{
+  console.log("HEllo")
+  res.render('createEventPage');
+}) 
+app.get('/createRSO',(req,res)=>{
+  res.render('createRSOPage');
+}) 
 app.get('/',(req,res)=>{
   if(req.query.user)
   {
