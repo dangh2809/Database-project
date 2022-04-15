@@ -33,14 +33,20 @@
                   <label for="eventDescription">Description</label>
                   <input type="text" class="form-control" id="eventDescription" name="eventDescription" placeholder="Event's Description">
                 </div>
+              
                 <div class="form-group">
                   <label for="eventType">Event Type</label>
-                  <select id="eventType">
+                  <select id="eventType" onchange="rsochange()">
                     <option value="4">public</option>
                     <option value="14">private</option>
                     <option value="24">RSO</option>
                   </select>
                 </div>
+                  <select style="display: none;" id="RSOList">
+                    <%for (let i=0; i<3; i++) { %>
+                      <option value=<%=i%>><%=i%></option>
+                    <% }%>
+                  </select>
                 <label for="locationCoord">Location</label>
                 <div class="d-flex flex-row locationCoord">
                     <div class="form-group">
@@ -78,6 +84,30 @@
 
         <!-- </div> -->
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
+<script>
+  function rsochange()
+  {
+  var x=document.getElementById("eventType").selectedIndex;
+  console.log("WASSAP"+x)
+  if(x==2)
+  {
+    console.log("J+")
+    document.getElementById("RSOList").style.display='block'
+  }
+  else{
+    document.getElementById("RSOList").style.display='none'
+
+  }
+  }
+  // document.getElementById('eventType').onchange(new Event(
+  //   if(document.getElementById('eventType').selectedIndex ==2)
+  //   {
+
+  //   }
+  //   )
+  // )
+</script>
 </html>
