@@ -115,7 +115,7 @@ app.get('/',(req,res)=>{
         });
         console.log(element.eventdate)
          time= element.eventTime;
-    arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat })
+    arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat,"eventID":element.eventId })
 
 
 
@@ -154,18 +154,21 @@ connection.query(userSQL, function (err, result) {
             });
             console.log(element.eventdate)
              time= element.eventTime;
-        arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat })
+        arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat ,"eventID":element.eventId})
             
       });
     returnObject["Private"] = arrayOFEvents; 
     var RSOsql="SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip,c.RSOName FROM uniEvents e INNER JOIN (SELECT r.RSOID,r.RSOName FROM userrso ur inner join rso r on ur.RSOID= r.RSOID where userID="+req.query.user+") c on e.RSOId=c.RSOID GROUP BY e.RSOId;"
-      console.log(RSOsql)
+    console.log(RSOsql)
     connection.query(RSOsql, function (err, result) {
       arrayOFEvents =[]
 
           var results= JSON.parse(JSON.stringify(result))
           console.log(JSON.stringify(result));
+          if(result)
+          {
           var curCat = result[0].RSOName
+          }
           var dat ,time,eventTime=''
           results.forEach(element => {
             if(curCat == element.RSOName)
@@ -179,7 +182,7 @@ connection.query(userSQL, function (err, result) {
               });
                time=new Date(dat).toLocaleTimeString();
               eventTime= time
-              arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":eventTime,"eventDate":dat  })
+              arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":eventTime,"eventDate":dat ,"eventID":element.eventId })
               console.log( arrayOFEvents)
             }
             else
@@ -194,7 +197,7 @@ connection.query(userSQL, function (err, result) {
               });
                time=new Date(dat).toLocaleTimeString();
               eventTime= time
-              arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":eventTime,"eventDate":dat  })
+              arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":eventTime,"eventDate":dat,"eventID":element.eventId  })
               curCat=element.RSOName;
             }
           
