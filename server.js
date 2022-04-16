@@ -288,7 +288,7 @@ app.post('/createRSO', [
     {
       const alert = error.array()
       res.render('createRSOPage',{
-        alert
+        alert, userName: req.query.user
       })
       console.log("error")
     } else{
@@ -350,7 +350,7 @@ app.post('/createEvent',[
   check('contactEmail','Email is invalid').isEmail().normalizeEmail(),
   check('eventDescription','Description cannot be empty').exists().isLength({min:1}),
   check('xCoordinate','X-coordinate cannot be empty').exists().isLength({min:1}),
-  check('yCoordinate','Y-coordinate cannot be empty').exists().isLength({min:1}),,
+  check('yCoordinate','Y-coordinate cannot be empty').exists().isLength({min:1}),
   check('eventCat','Category cannot be empty').exists().isLength({min:1}),
   check('eventDate','Please specify date for the event').exists().isLength({min:1}),
   check('eventTime','Please specify time for the event').exists().isLength({min:1}),
@@ -360,29 +360,33 @@ app.post('/createEvent',[
     // req.body -- contains form data
 
     console.log(req.query.user);
-    const error= validationResult(req)
+    const error= validationResult(req);
     if(!error.isEmpty())
     {
       const alert = error.array()
-      res.render('createRSOPage',{
-        alert
+      res.render('createEventPage',{
+        alert, userName: req.query.user, list: []
       })
       console.log("error")
     } else{
+      let object= req.body;
+      console.log("eventype is " + object.eventType);
       if(req.query.user){
-        let object= req.body;
-        let locationSQL = `select locationID from location where locationX=${object.xCoordinate} and locationY=${object.yCoordinate}`;
+        
+        let uniLocationCatID = `select u.univeristyID, l.locationID, c.catID from location l, eventcategory c, users u where l.locationX=${object.xCoordinate} and l.locationY=${object.yCoordinate} and c.catName='${object.eventCat}' and u.userID=${req.query.user}`;
        
-        connection.query(locationSQL, function (err, result){
+        connection.query(uniLocationCatID, function (err, result){
           if (err){
             console.log("error in unisql");
             throw err;
           } 
           else {
-            let locations= JSON.parse(JSON.stringify(result));
+            let uniLocateionCatIDs= JSON.parse(JSON.stringify(result));
+            console.log("hello")
+            console.log(uniLocateionCatIDs);
             if (object.eventType==4){
               // when event type is public
-              let publicEventSQL = `insert into unievents(eventType, eventName, eventDescrip, eventLocation, eventDate, eventPhone, eventEmail, eventTime, eventcategory ) values(${object.eventType},'${object.eventName}','${object.eventDescription}', ${locations[0].locationID}, '${object.eventLocation}', '${object.eventCat}')`;
+              let publicEventSQL = `insert into unievents(eventType, eventName, eventDescrip, eventLocation, eventDate, eventPhone, eventEmail, eventTime, eventcategory ) values(${object.eventType},'${object.eventName}','${object.eventDescription}', ${uniLocateionCatIDs[0].locationID},'${object.eventDate}','${object.contactPhoneNumber}','${object.contactEmail}', '${object.eventTime}', ${uniLocateionCatIDs[0].catID})`;
               connection.query(publicEventSQL, (err, result) =>{
                 if (err){
                   console.log("error in publicsql");
@@ -391,47 +395,36 @@ app.post('/createEvent',[
                   res.redirect(`/?user=${req.query.user}`);
                 }
               })
-            } else{
-              // when event type is private or RSO
-              let uniIDSQL = `select univeristyID from users where userID=${req.query.user}`;
-              connection.query(publicEventSQL, (err, result) =>{
+            } else if (object.eventType == 14 ){
+              // when event type is private
+              let privateEventSQL = `insert into unievents(uniID, eventType, eventName, eventDescrip, eventLocation, eventDate, eventPhone, eventEmail, eventTime, eventcategory ) values(${uniLocateionCatIDs[0].univeristyID},${object.eventType},'${object.eventName}','${object.eventDescription}', ${uniLocateionCatIDs[0].locationID},'${object.eventDate}','${object.contactPhoneNumber}','${object.contactEmail}', '${object.eventTime}', ${uniLocateionCatIDs[0].catID})`;
+              connection.query(privateEventSQL, (err, result) =>{
                 if (err){
-                  console.log("error in publicsql");
+                  console.log("error in privatesql");
                   throw err;
                 } else {
-                  let results= JSON.parse(JSON.stringify(result));
-                  if (object.eventType == 14){
-                    // when event type is private
-                    let privateEventSQL = `insert into unievents(uniID, eventType, eventName, eventDescrip, eventLocation, eventDate, eventPhone, eventEmail, eventTime, eventcategory ) values(${results[0].univeristyID},${object.eventType},'${object.eventName}','${object.eventDescription}', ${locations[0].locationID}, '${object.eventLocation}', '${object.eventCat}')`;
-                    connection.query(privateEventSQL, (err, result) =>{
-                      if (err){
-                        console.log("error in privateSQL");
-                        throw err;
-                      } else {
-                        res.redirect(`/?user=${req.query.user}`);
-                      }
-                    })
-                  } else {
-                    // when event type is RSO
-                    let rsoSQL = `insert into unievents(uniID, RSOId, eventType, eventName, eventDescrip, eventLocation, eventDate, eventPhone, eventEmail, eventTime, eventcategory ) values(${results[0].univeristyID},${object.RSOList},${object.eventType},'${object.eventName}','${object.eventDescription}', ${locations[0].locationID}, '${object.eventLocation}', '${object.eventCat}')`;
-                    connection.query(rsoSQL, (err, result) =>{
-                      if (err){
-                        console.log("error in rsoSQL");
-                        throw err;
-                      } else {
-                        res.redirect(`/?user=${req.query.user}`);
-                      }
-                    })
-                  }
-                  
+                  res.redirect(`/?user=${req.query.user}`);
                 }
               })
-            } 
-          }
+            } else if (object.eventType == 24){
+              // when event type is RSO
+              let rsoEventSQL = `insert into unievents(uniID,RSOId, eventType, eventName, eventDescrip, eventLocation, eventDate, eventPhone, eventEmail, eventTime, eventcategory ) values(${uniLocateionCatIDs[0].univeristyID},${object.RSOList},${object.eventType},'${object.eventName}','${object.eventDescription}', ${uniLocateionCatIDs[0].locationID},'${object.eventDate}','${object.contactPhoneNumber}','${object.contactEmail}', '${object.eventTime}', ${uniLocateionCatIDs[0].catID})`;
+              connection.query(rsoEventSQL, (err, result) =>{
+                if (err){
+                  console.log("error in rsosql");
+                  throw err;
+                } else {
+                  res.redirect(`/?user=${req.query.user}`);
+                }
+              })
+            } else{
+             console.log('evenType invalid');
+           } 
+         }
 
-        })
+       })
       } else {
-        console.log("query not found")
+       console.log("query not found")
       }
     }
   })

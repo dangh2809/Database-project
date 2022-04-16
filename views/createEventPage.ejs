@@ -23,7 +23,7 @@
           <%  })} %> 
           <div>
 
-            <form method="post" action="/createEvent?user?=<%=userName%>">
+            <form method="post" action="/createEvent?user=<%=userName%>">
                 
                 <div class="form-group">
                   <label for="eventName">Title</label>
@@ -36,16 +36,16 @@
               
                 <div class="form-group">
                   <label for="eventType">Event Type</label>
-                  <select id="eventType" onchange="rsochange()">
-                    <option value="4">public</option>
-                    <option value="14">private</option>
-                    <option value="24">RSO</option>
+                  <select id="eventType" name="eventType" onchange="rsochange()">
+                    <option value=4>public</option>
+                    <option value=14>private</option>
+                    <option value=24>RSO</option>
                   </select>
                 </div>
                 <div class="form-group">
                   <select style="display: none;" id="RSOList" name="RSOList">
                     <%for (let i=0; i<list.length; i++) { %>
-                      <option value=<%=list[i].RSOName%>><%=list[i].RSOName%></option>
+                      <option value=<%=list[i].RSOID%>><%=list[i].RSOName%></option>
                     <% }%>
                   </select>
                 </div>
@@ -93,6 +93,7 @@
   function rsochange()
   {
   var x=document.getElementById("eventType").selectedIndex;
+  console.log(document.getElementById("eventType").value);
   console.log("WASSAP"+x)
   if(x==2)
   {
