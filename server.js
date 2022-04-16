@@ -148,6 +148,7 @@ app.get('/createUniversity', (req, res)=>{
   res.render('createUniPage', {userName: req.query.user});
 })
 app.get('/createEvent',(req,res)=>{
+  
   console.log("reach get create");
   if (req.query.user){
     let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
@@ -528,12 +529,31 @@ app.post('/createEvent',[
 ], function(req, res){ // Specifies which URL to listen for
     // req.body -- contains form data
 
-    console.log(req.query.user);
+    console.log(req);
     const error= validationResult(req);
+    console.log(error);
     if(!error.isEmpty())
     {
       const alert = error.array()
-      res.redirect(`/createEvent?user=${req.query.user}`, {alert});
+      let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
+      connection.query(rsoSQL, (err, result) =>{
+        if (err){
+          console.log("error in rsoSQL");
+          throw err;
+        } else{
+          var rsoList= JSON.parse(JSON.stringify(result));
+          let locationSQL = `select locationID, locationDescrip from location`;
+          connection.query(locationSQL, (err, result) =>{
+            if (err){
+              console.log("error in rsoSQL");
+              throw err;
+            } else{
+              var locationList= JSON.parse(JSON.stringify(result));
+              res.render("CreateEventPage", {alert,RSOlist: rsoList,locationList:locationList, userName: req.query.user});
+            }
+          })
+        }
+      })
       console.log("error")
     } else{
       let object= req.body;
@@ -542,16 +562,52 @@ app.post('/createEvent',[
         let uniIDsql = `select univeristyID from users where userID=${req.query.user}`;
         connection.query(uniIDsql, (err, result)=>{
           if (err){
+ let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
+    connection.query(rsoSQL, (err, result) =>{
+      if (err){
+        console.log("error in rsoSQL");
+        throw err;
+      } else{
+        var rsoList= JSON.parse(JSON.stringify(result));
+        let locationSQL = `select locationID, locationDescrip from location`;
+        connection.query(locationSQL, (err, result) =>{
+          if (err){
+            console.log("error in rsoSQL");
             throw err;
-          } else {
+          } else{
+            var locationList= JSON.parse(JSON.stringify(result));
+            res.render("CreateEventPage", {RSOlist: rsoList,locationList:locationList, userName: req.query.user});
+          }
+        })
+      }
+    })          } else {
             var uniID = JSON.parse(JSON.stringify(result));
             let correctLocationID;
             if (object.locationList == -1){
               let insertsql = `insert into location(locationX, locationY, locationDescrip) values(${object.xCoordinate}, ${object.yCoordinate}, '${object.locationDescrip}')`;
-              connection.query(insertsql, (err, result) =>{
-                if (err){
-                  res.render('createEventPage');
-                }
+              connection.query(insertsql, (errI, result) =>{
+                if (errI){
+                  let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
+                  connection.query(rsoSQL, (err, result) =>{
+                    if (err){
+                      console.log("error in rsoSQL");
+                      throw err;
+                    } else{
+                      var rsoList= JSON.parse(JSON.stringify(result));
+                      let locationSQL = `select locationID, locationDescrip from location`;
+                      connection.query(locationSQL, (err, result) =>{
+                        if (err){
+                          console.log("error in rsoSQL");
+                          throw err;
+                        } else{
+                          var locationList= JSON.parse(JSON.stringify(result));
+                          const alert = error.array()
+
+                          res.render("CreateEventPage", {alert,RSOlist: rsoList,locationList:locationList, userName: req.query.user});
+                        }
+                      })
+                    }
+                  })                }
                 else {
                   let selectlocationID = `select locationID from location where locationX=${object.xCoordinate} and locationY=${object.yCoordinate}`;
                   connection.query(selectlocationID, (err, result)=>{
@@ -563,10 +619,29 @@ app.post('/createEvent',[
                       if (object.eventType==4){
                         // when event type is public
                         let publicEventSQL = `insert into unievents(eventType, eventName, eventDescrip, eventLocation, eventDate, eventPhone, eventEmail, eventTime, eventcategory ) values(${object.eventType},'${object.eventName}','${object.eventDescription}', ${correctLocationID},'${object.eventDate}','${object.contactPhoneNumber}','${object.contactEmail}', '${object.eventTime}', '${object.eventCat}')`;
-                        connection.query(publicEventSQL, (err, result) =>{
-                          if (err){
-                            console.log("error in publicsql");
-                            throw err;
+                        connection.query(publicEventSQL, (err1, result) =>{
+                          if (err1){
+                  let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
+                  connection.query(rsoSQL, (err, result) =>{
+                    if (err){
+                      console.log("error in rsoSQL");
+                      throw err;
+                    } else{
+                      var rsoList= JSON.parse(JSON.stringify(result));
+                      let locationSQL = `select locationID, locationDescrip from location`;
+                      connection.query(locationSQL, (err, result) =>{
+                        if (err){
+                          console.log("error in rsoSQL");
+                          throw err;
+                        } else{
+                          var locationList= JSON.parse(JSON.stringify(result));
+                          const alert = [{msg:err1}]
+
+                          res.render("CreateEventPage", {alert,RSOlist: rsoList,locationList:locationList, userName: req.query.user});
+                        }
+                      })
+                    }
+                  })   
                           } else {
                             res.redirect(`/?user=${req.query.user}`);
                           }
@@ -574,21 +649,60 @@ app.post('/createEvent',[
                       } else if (object.eventType == 14 ){
                         // when event type is private
                         let privateEventSQL = `insert into unievents(uniID, eventType, eventName, eventDescrip, eventLocation, eventDate, eventPhone, eventEmail, eventTime, eventcategory ) values(${uniID[0].univeristyID},${object.eventType},'${object.eventName}','${object.eventDescription}', ${correctLocationID},'${object.eventDate}','${object.contactPhoneNumber}','${object.contactEmail}', '${object.eventTime}','${object.eventCat}')`;
-                        connection.query(privateEventSQL, (err, result) =>{
-                          if (err){
+                        connection.query(privateEventSQL, (err2, result) =>{
+                          if (err2){
                             console.log("error in privatesql");
-                            throw err;
-                          } else {
+                            let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
+                            connection.query(rsoSQL, (err, result) =>{
+                              if (err){
+                                console.log("error in rsoSQL");
+                                throw err;
+                              } else{
+                                var rsoList= JSON.parse(JSON.stringify(result));
+                                let locationSQL = `select locationID, locationDescrip from location`;
+                                connection.query(locationSQL, (err, result) =>{
+                                  if (err){
+                                    console.log("error in rsoSQL");
+                                    throw err;
+                                  } else{
+                                    var locationList= JSON.parse(JSON.stringify(result));
+                                    const alert = [{msg:err2}]
+          
+                                    res.render("CreateEventPage", {alert,RSOlist: rsoList,locationList:locationList, userName: req.query.user});
+                                  }
+                                })
+                              }
+                            })   
+                                                    } else {
                             res.redirect(`/?user=${req.query.user}`);
                           }
                         })
                       } else if (object.eventType == 24){
                         // when event type is RSO
                         let rsoEventSQL = `insert into unievents(uniID,RSOId, eventType, eventName, eventDescrip, eventLocation, eventDate, eventPhone, eventEmail, eventTime, eventcategory ) values(${uniID[0].univeristyID},${object.RSOList},${object.eventType},'${object.eventName}','${object.eventDescription}', ${correctLocationID},'${object.eventDate}','${object.contactPhoneNumber}','${object.contactEmail}', '${object.eventTime}', '${object.eventCat}')`;
-                        connection.query(rsoEventSQL, (err, result) =>{
-                          if (err){
-                            console.log("error in rsosql");
-                            throw err;
+                        connection.query(rsoEventSQL, (err3, result) =>{
+                          if (err3){
+                            let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
+                  connection.query(rsoSQL, (err, result) =>{
+                    if (err){
+                      console.log("error in rsoSQL");
+                      throw err;
+                    } else{
+                      var rsoList= JSON.parse(JSON.stringify(result));
+                      let locationSQL = `select locationID, locationDescrip from location`;
+                      connection.query(locationSQL, (err, result) =>{
+                        if (err){
+                          console.log("error in rsoSQL");
+                          throw err;
+                        } else{
+                          var locationList= JSON.parse(JSON.stringify(result));
+                          const alert = [{msg:err3}]
+
+                          res.render("CreateEventPage", {alert,RSOlist: rsoList,locationList:locationList, userName: req.query.user});
+                        }
+                      })
+                    }
+                  })   
                           } else {
                             res.redirect(`/?user=${req.query.user}`);
                           }
@@ -606,10 +720,29 @@ app.post('/createEvent',[
             if (object.eventType==4){
               // when event type is public
               let publicEventSQL = `insert into unievents(eventType, eventName, eventDescrip, eventLocation, eventDate, eventPhone, eventEmail, eventTime, eventcategory ) values(${object.eventType},'${object.eventName}','${object.eventDescription}', ${correctLocationID},'${object.eventDate}','${object.contactPhoneNumber}','${object.contactEmail}', '${object.eventTime}', '${object.eventCat}')`;
-              connection.query(publicEventSQL, (err, result) =>{
-                if (err){
-                  console.log("error in publicsql");
-                  throw err;
+              connection.query(publicEventSQL, (err5, result) =>{
+                if (err5){
+                  let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
+                  connection.query(rsoSQL, (err, result) =>{
+                    if (err){
+                      console.log("error in rsoSQL");
+                      throw err;
+                    } else{
+                      var rsoList= JSON.parse(JSON.stringify(result));
+                      let locationSQL = `select locationID, locationDescrip from location`;
+                      connection.query(locationSQL, (err, result) =>{
+                        if (err){
+                          console.log("error in rsoSQL");
+                          throw err;
+                        } else{
+                          var locationList= JSON.parse(JSON.stringify(result));
+                          const alert = [{msg:err5}]
+                          console.log(alert)
+                          res.render("CreateEventPage", {alert,RSOlist: rsoList,locationList:locationList, userName: req.query.user});
+                        }
+                      })
+                    }
+                  })   
                 } else {
                   res.redirect(`/?user=${req.query.user}`);
                 }
@@ -617,10 +750,29 @@ app.post('/createEvent',[
             } else if (object.eventType == 14 ){
               // when event type is private
               let privateEventSQL = `insert into unievents(uniID, eventType, eventName, eventDescrip, eventLocation, eventDate, eventPhone, eventEmail, eventTime, eventcategory ) values(${uniID[0].univeristyID},${object.eventType},'${object.eventName}','${object.eventDescription}', ${correctLocationID},'${object.eventDate}','${object.contactPhoneNumber}','${object.contactEmail}', '${object.eventTime}','${object.eventCat}')`;
-              connection.query(privateEventSQL, (err, result) =>{
-                if (err){
-                  console.log("error in privatesql");
-                  throw err;
+              connection.query(privateEventSQL, (err6, result) =>{
+                if (err6){
+                  let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
+                  connection.query(rsoSQL, (err, result) =>{
+                    if (err){
+                      console.log("error in rsoSQL");
+                      throw err;
+                    } else{
+                      var rsoList= JSON.parse(JSON.stringify(result));
+                      let locationSQL = `select locationID, locationDescrip from location`;
+                      connection.query(locationSQL, (err, result) =>{
+                        if (err){
+                          console.log("error in rsoSQL");
+                          throw err;
+                        } else{
+                          var locationList= JSON.parse(JSON.stringify(result));
+                          const alert = [{msg:err6}]
+
+                          res.render("CreateEventPage", {alert,RSOlist: rsoList,locationList:locationList, userName: req.query.user});
+                        }
+                      })
+                    }
+                  })   
                 } else {
                   res.redirect(`/?user=${req.query.user}`);
                 }
@@ -628,10 +780,29 @@ app.post('/createEvent',[
             } else if (object.eventType == 24){
               // when event type is RSO
               let rsoEventSQL = `insert into unievents(uniID,RSOId, eventType, eventName, eventDescrip, eventLocation, eventDate, eventPhone, eventEmail, eventTime, eventcategory ) values(${uniID[0].univeristyID},${object.RSOList},${object.eventType},'${object.eventName}','${object.eventDescription}', ${correctLocationID},'${object.eventDate}','${object.contactPhoneNumber}','${object.contactEmail}', '${object.eventTime}', '${object.eventCat}')`;
-              connection.query(rsoEventSQL, (err, result) =>{
-                if (err){
-                  console.log("error in rsosql");
-                  throw err;
+              connection.query(rsoEventSQL, (err7, result) =>{
+                if (err7){
+                  let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
+                  connection.query(rsoSQL, (err, result) =>{
+                    if (err){
+                      console.log("error in rsoSQL");
+                      throw err;
+                    } else{
+                      var rsoList= JSON.parse(JSON.stringify(result));
+                      let locationSQL = `select locationID, locationDescrip from location`;
+                      connection.query(locationSQL, (err, result) =>{
+                        if (err){
+                          console.log("error in rsoSQL");
+                          throw err;
+                        } else{
+                          var locationList= JSON.parse(JSON.stringify(result));
+                          const alert = [{msg:err7}]
+
+                          res.render("CreateEventPage", {alert,RSOlist: rsoList,locationList:locationList, userName: req.query.user});
+                        }
+                      })
+                    }
+                  })   
                 } else {
                   res.redirect(`/?user=${req.query.user}`);
                 }
