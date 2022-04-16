@@ -92,7 +92,7 @@ app.get('/event',(req,res)=>{
     console.log("pmsada"+results)
     results.forEach(element => {
         //NOTE SAVE DATE AS UTC
-         dat=element.eventdate;
+         dat=element.eventDate;
         dat =new Date(dat).toLocaleString('en', {
           month: 'long',
           day: 'numeric',
@@ -144,7 +144,56 @@ app.post('/comment',(req,res)=>{
 
 })
 app.get('/createEvent',(req,res)=>{
+<<<<<<< Updated upstream
   res.render('createEventPage', {userName:req.query.user});
+=======
+  if (req.query.user){
+    let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
+    connection.query(rsoSQL, (err, result) =>{
+      if (err){
+        console.log("error in rsoSQL");
+        throw err;
+      } else{
+        var rsoList= JSON.parse(JSON.stringify(result));
+        let locationSQL = `select locationID, locationDescrip from location`;
+        connection.query(locationSQL, (err, result) =>{
+          if (err){
+            console.log("error in rsoSQL");
+            throw err;
+          } else{
+            var locationList= JSON.parse(JSON.stringify(result));
+            res.render("CreateEventPage", {RSOlist: rsoList,locationList:locationList, userName: req.query.user});
+          }
+        })
+      }
+    })
+
+    
+  }
+  
+})
+app.get('/RSO', (req, res)=>{
+  if (req.query.user){
+    let rsoUserSQL=`select * from (Select r.* from RSO r Inner Join(Select univeristyID from users u where u.userID=${req.query.user})c on c.univeristyID=r.universityID) p where p.RSOID not in (select RSOID from userrso where userID=${req.query.user}) and p.RSOstatus=0`;
+  connection.query(rsoUserSQL, (err, result)=>{
+    if (err){
+      console.log("error in rsousersql");
+      throw err;
+    } else {
+      var results= JSON.parse(JSON.stringify(result));
+      let ArsoUserSQL=`select * from (Select r.* from RSO r Inner Join(Select univeristyID from users u where u.userID=${req.query.user})c on c.univeristyID=r.universityID) p where p.RSOID not in (select RSOID from userrso where userID=${req.query.user}) and p.RSOstatus=1`;
+      connection.query(ArsoUserSQL, (err, result)=>{
+        if (err){
+          console.log("error in rsousersql");
+          throw err;
+        } else {
+          var Aresults= JSON.parse(JSON.stringify(result));
+
+      res.render('RSOPage', {userName: req.query.user, RSOList: results,ActiveRSOList:Aresults});
+    }});}
+  })
+  }
+>>>>>>> Stashed changes
 }) 
 app.get('/createRSO',(req,res)=>{
   res.render('createRSOPage',{userName:req.query.user});
@@ -223,9 +272,9 @@ connection.query(userSQL, function (err, result) {
 
           var results= JSON.parse(JSON.stringify(result))
           console.log(JSON.stringify(result));
-          if(result)
+          if(results.length!=0)
           {
-          var curCat = result[0].RSOName
+          var curCat = results[0].RSOName
           }
           var dat ,time,eventTime=''
           results.forEach(element => {
