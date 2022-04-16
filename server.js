@@ -85,6 +85,9 @@ app.post('/SignUp',(req,res)=>{
 app.get('/event',(req,res)=>{
   res.render('eventPage');
 })
+app.get('/createUniversity', (req, res)=>{
+  res.render('createUniPage', {userName: req.query.user});
+})
 app.get('/createEvent',(req,res)=>{
   
   if (req.query.user){
