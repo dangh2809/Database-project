@@ -104,7 +104,21 @@ app.get('/createEvent',(req,res)=>{
   
 })
 app.get('/RSO', (req, res)=>{
-  res.render('RSOPage', {userName: req.query.user});
+  res.render('RSOPage', {userName: req.query.user, RSOList: [
+    {
+      name: "hieu",
+      phone: "234"
+    },
+    {
+      name: "huy",
+      phone: "178"
+    },
+    {
+      name: "na",
+      phone: "931"
+    },
+
+  ]});
 }) 
 app.get('/createRSO',(req,res)=>{
   res.render('createRSOPage',{userName:req.query.user});

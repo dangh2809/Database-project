@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+   
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,12 +11,31 @@
     <link rel="stylesheet" type="text/css" href="/public/css/mainStyleSheet.css">
 
 </head>
-<body class=" justify-content-center align-items-center d-flex p-5">
+
+<body >
     <!-- <div class="backgroundPage d-flex justify-content-center align-items-center"> -->
-        <div class="container bodyForm row justify-content-center ">
+        <div class="container d-flex justify-content-center position-absolute top-50 start-0 translate-middle-y ">
         
-            <div class="rsoDetails m-2">
-                <h1><%=userName%></h1>
+            <div class="m-2 pt-5">
+                <% for (var rso of RSOList) {%>
+                    <div class="card mb-3" style="max-width: 540px">
+                        <div class="row g-0">
+                          <div class="col-md-4">
+                            <img src="/RSOImages.jpeg" class="img-fluid rounded-start" >
+                          </div>
+                          <div class="col-md-8">
+                            <div class="card-body" action="/RSO?user=<%=userName%>&rso=<%=rso.name%>">
+                              <h5 class="card-title"><%=rso.name%>></h5>
+                              <p class="card-text"><%=rso.phone%></p>
+                              <form method="post" action="">
+                              <button type="submit" class="btn btn-success">Join</button>
+                                </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    
+                <%}%>
             </div>
         </div>
 
