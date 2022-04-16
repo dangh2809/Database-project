@@ -42,11 +42,13 @@
                     <option value="24">RSO</option>
                   </select>
                 </div>
-                  <select style="display: none;" id="RSOList">
+                <div class="form-group">
+                  <select style="display: none;" id="RSOList" name="RSOList">
                     <%for (let i=0; i<list.length; i++) { %>
                       <option value=<%=list[i].RSOName%>><%=list[i].RSOName%></option>
                     <% }%>
                   </select>
+                </div>
                 <label for="locationCoord">Location</label>
                 <div class="d-flex flex-row locationCoord">
                     <div class="form-group">
