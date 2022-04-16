@@ -106,21 +106,42 @@ app.get('/event',(req,res)=>{
 returnObject["eventData"] = arrayOFEvents;
 var eventCommentSQL="select c.*,u.firstname,u.lastname from eventcomment c inner join users u on u.userID=c.userID  where eventID="+req.query.event+"  order by timeComment ;";
   connection.query(eventCommentSQL, function (err, result) {
-    var arrayP=[{"comment":"WASSSSAP","Name":"ram","rating":"10"}];
+    var arrayP=[];
     console.log("JO:AAA")
     var results= JSON.parse(JSON.stringify(result))
     var dat ,time,eventTime=''
     results.forEach(element => {
-    array.push({"comment":element.commentDescrip,"Name":element.firstname+" "+element.lastname,"rating":element.rating})
+    arrayP.push({"comment":element.commentDescrip,"Name":element.firstname+" "+element.lastname,"rating":element.rating})
     
     });
-    returnObject["comment"] = arrayP;
-    console.log(returnObject["comment"])
-    res.render('eventPage',{data:returnObject,comment:arrayP});
+    returnObject["comments"] = arrayP;
+    console.log(returnObject["comments"])
+    res.render('eventPage',{data:returnObject,comment:arrayP,user:req.query.user,event:req.query.event});
 
   });
 
 });
+})
+
+app.post('/comment',(req,res)=>{
+  console.log(req.body)
+  var commentSQL="INSERT INTO `eventcomment`  (`eventID`,`userID`,`commentDescrip`,`rating`)VALUES("+req.query.event+","+req.query.user+" ,'"+req.body.comment+"',"+req.body.star+");"
+  connection.query(commentSQL, function (err, result) {
+
+    if(err)
+    {
+    var upcommentSQL="UPDATE eventcomment SET commentDescrip = '"+req.body.comment+"',rating = "+req.body.star+" WHERE eventID ="+req.query.event+" AND `userID`= "+req.query.user+"";
+    connection.query(upcommentSQL, function (err, result) {
+      console.log(upcommentSQL)
+      res.redirect("/event?user="+req.query.user+"&event="+req.query.event)
+    
+    })
+    }
+    else{
+    res.redirect("/event?user="+req.query.user+"&event="+req.query.event)
+    }
+  });
+
 })
 app.get('/createEvent',(req,res)=>{
   res.render('createEventPage', {userName:req.query.user});
