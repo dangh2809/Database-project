@@ -85,7 +85,24 @@ app.get('/event',(req,res)=>{
   res.render('eventPage');
 })
 app.get('/createEvent',(req,res)=>{
-  res.render('createEventPage', {userName:req.query.user});
+  
+  if (req.query.user){
+    let rsoSQL = `select r.RSOID, r.RSOName from rso r inner join userrso u on r.RSOID=u.RSOID where u.userId=${req.query.user};`; //succesfull
+    connection.query(rsoSQL, (err, result) =>{
+      if (err){
+        console.log("error in rsoSQL");
+        throw err;
+      } else{
+        var results= JSON.parse(JSON.stringify(result));
+        console.log("hello");
+        console.log(result);
+        res.render("CreateEventPage", {list: results, userName: req.query.user});
+      }
+    })
+
+    
+  }
+  
 }) 
 app.get('/createRSO',(req,res)=>{
   res.render('createRSOPage',{userName:req.query.user});
@@ -102,7 +119,7 @@ app.get('/',(req,res)=>{
   var arrayOFEvents =[]
 //HELLOOO
   connection.query(publicSql, function (err, result) {
-    var results= JSON.parse(JSON.stringify(result))
+    var results= JSON.parse(JSON.stringify(result));
     var dat ,time,eventTime=''
     results.forEach(element => {
         //NOTE SAVE DATE AS UTC
@@ -115,10 +132,6 @@ app.get('/',(req,res)=>{
         console.log(element.eventdate)
          time= element.eventTime;
     arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat,"eventID":element.eventId })
-
-
-
-
 
   });
 returnObject["Public"] = arrayOFEvents;
@@ -288,17 +301,49 @@ app.post('/createRSO', [
             throw err;
           } 
           else {
-            let results= JSON.parse(JSON.stringify(result))
+            let results= JSON.parse(JSON.stringify(result));
+            console.log(results);
             let object= req.body;
             console.log(object);
-            let rsosql = `insert into rso(adminId, RSOName, RSODescrip, universityID, RSOstatus, numberOfStudents) values (${req.query.user},${object.rsoName},${object.rsoDescription}, ${results[0].univeristyID},0,1`;
+            console.log({
+              adminId: req.query.user,
+              RSOName: object.rsoName,
+              RSODescrip: object.rsoDescription,
+              universityID: results[0].univeristyID,
+              RSOstatus: 0,
+              numberOfStudents: 1
+            })
+            let rsosql = `insert into rso(adminId, RSOName, RSODescrip, universityID, RSOstatus, numberOfStudents) values (${req.query.user},'${object.rsoName}','${object.rsoDescription}', ${results[0].univeristyID},0,1)`;
+            
             connection.query(rsosql, function(err, result){
+              // let results= JSON.parse(JSON.stringify(result));
               if (err){
                 console.log("error in rsosql");
                 throw err;
               } 
               else {
-                res.redirect(`/?user=${req.body.user}`);
+                let RSOIdsql = `select RSOID where RSOName=${object.rsoName}`;
+                
+                connection.query(RSOIdsql,(err,result)=>{
+                  let results= JSON.parse(JSON.stringify(result));
+                  if (err) {
+                    console.log("error in userrso");
+                    throw err
+                  } else {
+                    let userrsoSQL = `insert into userrso(userID, RSOID) values(${req.query.user}, ${results[0].RSOID})`;
+                    connection.query(userrsoSQL,(err,result)=>{
+                      if (err) {
+                        console.log("error in userrso");
+                        throw err
+                      } else {
+                        
+                        res.redirect(`/?user=${req.query.user}`);
+                      }
+                    })
+                    res.redirect(`/?user=${req.query.user}`);
+                  }
+                })
+                
               }
             })
           }
