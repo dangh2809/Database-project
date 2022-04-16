@@ -313,14 +313,14 @@ app.post('/createRSO', [
                 throw err;
               } 
               else {
-                let RSOIdsql = `select RSOID where RSOName=${object.rsoName}`;
+                let RSOIdsql = `select RSOID from rso where RSOName='${object.rsoName}'`;
                 
                 connection.query(RSOIdsql,(err,result)=>{
-                  let results= JSON.parse(JSON.stringify(result));
                   if (err) {
                     console.log("error in userrso");
                     throw err
                   } else {
+                    let results= JSON.parse(JSON.stringify(result));
                     let userrsoSQL = `insert into userrso(userID, RSOID) values(${req.query.user}, ${results[0].RSOID})`;
                     connection.query(userrsoSQL,(err,result)=>{
                       if (err) {
