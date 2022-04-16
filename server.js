@@ -150,7 +150,7 @@ app.get('/createUniversity', (req, res)=>{
 app.get('/createEvent',(req,res)=>{
   
   if (req.query.user){
-    let rsoSQL = `select r.RSOID, r.RSOName from rso r inner join userrso u on r.RSOID=u.RSOID where u.userId=${req.query.user};`; //succesfull
+    let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
     connection.query(rsoSQL, (err, result) =>{
       if (err){
         console.log("error in rsoSQL");
@@ -527,7 +527,7 @@ app.post('/createEvent',[
       console.log("eventype is " + object.eventType);
       if(req.query.user){
         
-        let uniLocationCatID = `select u.univeristyID, l.locationID from location l, eventcategory c, users u where l.locationX=${object.xCoordinate} and l.locationY=${object.yCoordinate} and u.userID=${req.query.user}`;
+        let uniLocationCatID = `select u.univeristyID, l.locationID from location l, users u where l.locationX=${object.xCoordinate} and l.locationY=${object.yCoordinate} and u.userID=${req.query.user}`;
        
         connection.query(uniLocationCatID, function (err, result){
           if (err){
