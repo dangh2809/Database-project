@@ -93,7 +93,7 @@ app.get('/event',(req,res)=>{
     console.log("pmsada"+results)
     results.forEach(element => {
         //NOTE SAVE DATE AS UTC
-         dat=element.eventdate;
+         dat=element.eventDate;
         dat =new Date(dat).toLocaleString('en', {
           month: 'long',
           day: 'numeric',
@@ -148,6 +148,7 @@ app.get('/createUniversity', (req, res)=>{
   res.render('createUniPage', {userName: req.query.user});
 })
 app.get('/createEvent',(req,res)=>{
+  console.log("reach get create");
   if (req.query.user){
     let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
     connection.query(rsoSQL, (err, result) =>{
@@ -182,8 +183,16 @@ app.get('/RSO', (req, res)=>{
       throw err;
     } else {
       var results= JSON.parse(JSON.stringify(result));
-      res.render('RSOPage', {userName: req.query.user, RSOList: results});
-    }
+      let ArsoUserSQL=`select * from (Select r.* from RSO r Inner Join(Select univeristyID from users u where u.userID=${req.query.user})c on c.univeristyID=r.universityID) p where p.RSOID not in (select RSOID from userrso where userID=${req.query.user}) and p.RSOstatus=1`;
+      connection.query(ArsoUserSQL, (err, result)=>{
+        if (err){
+          console.log("error in rsousersql");
+          throw err;
+        } else {
+          var Aresults= JSON.parse(JSON.stringify(result));
+
+      res.render('RSOPage', {userName: req.query.user, RSOList: results,ActiveRSOList:Aresults});
+    }});}
   })
   }
 }) 
@@ -260,9 +269,9 @@ connection.query(userSQL, function (err, result) {
 
           var results= JSON.parse(JSON.stringify(result))
           console.log(JSON.stringify(result));
-          if(result)
+          if(results.length!=0)
           {
-          var curCat = result[0].RSOName
+          var curCat = results[0].RSOName
           }
           var dat ,time,eventTime=''
           results.forEach(element => {
@@ -524,9 +533,7 @@ app.post('/createEvent',[
     if(!error.isEmpty())
     {
       const alert = error.array()
-      res.render('createEventPage',{
-        alert, userName: req.query.user, RSOlist: [], locationList: []
-      })
+      res.redirect(`/createEvent?user=${req.query.user}`, {alert});
       console.log("error")
     } else{
       let object= req.body;
@@ -543,7 +550,7 @@ app.post('/createEvent',[
               let insertsql = `insert into location(locationX, locationY, locationDescrip) values(${object.xCoordinate}, ${object.yCoordinate}, '${object.locationDescrip}')`;
               connection.query(insertsql, (err, result) =>{
                 if (err){
-                  throw err;
+                  res.render('createEventPage');
                 }
                 else {
                   let selectlocationID = `select locationID from location where locationX=${object.xCoordinate} and locationY=${object.yCoordinate}`;

@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/public/css/signUp.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+
     <link rel="stylesheet" type="text/css" href="/public/css/mainStyleSheet.css">
 
 </head>
@@ -18,17 +20,17 @@
         
             <div class="eventDetails m-2">
                 <div class="d-flex">
-                    <i class="bi bi-calendar "></i> <p class="eventDate mx-3"> <%=data["eventData"][0].eventTitle%></p>
+                     <h2 class=" mx-3"> <%=data["eventData"][0].eventTitle%></p>
                 </div>
                 <div class="d-flex">
-                <i class="bi bi-clock "> </i><p class="eventTime mx-3">   1:00:00 PM</p>
+                    <p class=" mx-3"> <%=data["eventData"][0].eventDecrip%></p>
                 </div>
                 <div class="d-flex">
-                <i class="bi bi-currency-dollar"></i><p class="eventPrice mx-3">19.99</p>
+                    <i class="bi bi-calendar "></i> <p class="eventDate mx-3"> <%=data["eventData"][0].eventDate%></p>
                 </div>
                 <div class="d-flex">
-                  <i class="bi bi-heart-fill"></i><p class="eventRate mx-3">69</p>
-                  </div>
+                <i class="bi bi-clock "> </i><p class="eventTime mx-3"><%=data["eventData"][0].eventTime%></p>
+                </div>
               </div>
               <section>
                 <form method="post" action="/comment?user=<%=user%>&event=<%=event%> ">

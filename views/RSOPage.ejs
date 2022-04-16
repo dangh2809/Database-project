@@ -14,9 +14,32 @@
 
 <body >
     <!-- <div class="backgroundPage d-flex justify-content-center align-items-center"> -->
-        <div class="container d-flex justify-content-center position-absolute top-50 start-0 translate-middle-y ">
+        <div class="container d-flex flex-column justify-content-center ">
+          <div class=" m-2 pt-5">
+            <h2 class="text-white">Active RSO</h2>
+            <% for (var rso of ActiveRSOList) {%>
+                <div class="card mb-3 bg-light" style="max-width: 540px">
+                    <div class="row g-0">
+                      <div class="col-md-4">
+                        <img src="/RSOImages.jpeg" class="img-fluid rounded-start" >
+                      </div>
+                      <div class="col-md-8">
+                        <div class="card-body">
+                          <h5 class="card-title"><%=rso.RSOName%></h5>
+                          <p class="card-text"><%=rso.RSODescrip%></p>
+                          <form method="post" action="/RSO?user=<%=userName%>&rso=<%=rso.RSOID%>">
+                            <button type="submit" class="btn btn-success">Join</button>
+                        </form>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+            <%}%>
+          </div>
         
-            <div class="m-2 pt-5">
+            <div class=" m-2 pt-5">
+                <h2 class="text-white">Pending</h2>
                 <% for (var rso of RSOList) {%>
                     <div class="card mb-3 bg-light" style="max-width: 540px">
                         <div class="row g-0">
