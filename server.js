@@ -409,6 +409,36 @@ app.post('/createRSO', [
     }
 
 })
+app.post('/createUniveristy',[
+  check('uniName', 'University Name cannot be empty').exists().isLength({min:1}),
+  check('uniDescription', 'University Description cannot be empty').exists().isLength({min:1}),
+  check('uniLocation', 'University Location cannot be empty').exists().isLength({min:1}),
+  //check('uniPictureLink', 'University Picture Link cannot be empty').exists().isLength({min:1}),
+  check('uniEmailDomain', 'University Email Domain cannot be empty').exists().isLength({min:1}),
+], (req, res)=>{
+  const error= validationResult(req)
+  if(!error.isEmpty())
+  {
+    const alert = error.array()
+    res.render('createUniPage',{
+      alert
+    })
+    console.log("error")
+  } else {
+    let object = req.body;
+    if (req.query.user){
+      let unisql=`insert into univeristy(universityName, uniDescription, uniLocation, uniPictureLink, userCreated, uniEmailDomain) values('${object.uniName}', '${object.uniDescription}', '${object.uniLocation}', '${object.uniPictureLink}', ${req.query.user}, '${object.uniEmailDomain}')`;
+      connection.query(unisql, (err, result)=>{
+        if (err) {
+          console.log("error in unisql");
+          throw err;
+        } else{
+          res.redirect(`/?user=${req.query.user}`);
+        }
+      })
+    }
+  }
+})
 
 // app.post('/createEvent',[
 //   check('eventName','Event cannot be empty').exists().isLength({min:1}),
