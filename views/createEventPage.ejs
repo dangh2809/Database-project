@@ -43,20 +43,30 @@
                   </select>
                 </div>
                 <div class="form-group">
-                  <select style="display: none;" id="RSOList" name="RSOList">
-                    <%for (let i=0; i<list.length; i++) { %>
-                      <option value=<%=list[i].RSOID%>><%=list[i].RSOName%></option>
+                  <select style="display: none;" id="RSOList" name="RSOList" >
+                    <%for (let i=0; i<RSOlist.length; i++) { %>
+                      <option value=<%=RSOlist[i].RSOID%>><%=RSOlist[i].RSOName%></option>
                     <% }%>
                   </select>
                 </div>
                 <label for="locationCoord">Location</label>
-                
-                <div class="d-flex flex-row locationCoord">
+                <div class="form-group">
+                  <select id="locationList" name="locationList" onchange="locationchange()">
+                    <%for (let i=0; i<locationList.length; i++) { %>
+                      <option value=<%=locationList[i].locationID%>><%=locationList[i].locationDescrip%></option>
+                    <% }%>
+                    <option value=-1>Others</option>
+                  </select>
+                </div>
+                <div class="flex-row locationCoord" style="display: none;" id="newLocation">
                     <div class="form-group">
                     <input type="text" class="form-control" id="xCoordinate" name="xCoordinate" placeholder="X Coordinate">
                   </div>
                   <div class="form-group">
                     <input type="text" class="form-control" id="yCoordinate" name="yCoordinate" placeholder="Y Coordinate">
+                  </div>
+                  <div class="form-group">
+                    <input type="text" class="form-control" id="locationDescrip" name="locationDescrip" placeholder="locationDescrip">
                   </div>
                 </div>
                 <div class="form-group">
@@ -93,7 +103,7 @@
   function rsochange()
   {
   var x=document.getElementById("eventType").selectedIndex;
-  console.log(document.getElementById("eventType").value);
+  var y = console.log(document.getElementById("eventType").value);
   console.log("WASSAP"+x)
   if(x==2)
   {
@@ -102,6 +112,19 @@
   }
   else{
     document.getElementById("RSOList").style.display='none'
+
+  }
+  }
+  function locationchange()
+  {
+  var x=document.getElementById("locationList").value;
+  console.log(x);
+  if(x== -1)
+  {
+    document.getElementById("newLocation").style.display='block'
+  }
+  else{
+    document.getElementById("newLocation").style.display='none';
 
   }
   }
