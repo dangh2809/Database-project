@@ -409,7 +409,7 @@ app.post('/createRSO', [
     }
 
 })
-app.post('/createUniveristy',[
+app.post('/createUniversity',[
   check('uniName', 'University Name cannot be empty').exists().isLength({min:1}),
   check('uniDescription', 'University Description cannot be empty').exists().isLength({min:1}),
   check('uniLocation', 'University Location cannot be empty').exists().isLength({min:1}),
@@ -427,7 +427,7 @@ app.post('/createUniveristy',[
   } else {
     let object = req.body;
     if (req.query.user){
-      let unisql=`insert into univeristy(universityName, uniDescription, uniLocation, uniPictureLink, userCreated, uniEmailDomain) values('${object.uniName}', '${object.uniDescription}', '${object.uniLocation}', '${object.uniPictureLink}', ${req.query.user}, '${object.uniEmailDomain}')`;
+      let unisql=`insert into university(universityName, uniDescription, uniLocation, uniPictureLink, userCreated, uniEmailDomain) values('${object.uniName}', '${object.uniDescription}', '${object.uniLocation}', '${object.uniPictureLink}', ${req.query.user}, '${object.uniEmailDomain}')`;
       connection.query(unisql, (err, result)=>{
         if (err) {
           console.log("error in unisql");
