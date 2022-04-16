@@ -144,9 +144,7 @@ app.post('/comment',(req,res)=>{
 
 })
 app.get('/createEvent',(req,res)=>{
-<<<<<<< Updated upstream
   res.render('createEventPage', {userName:req.query.user});
-=======
   if (req.query.user){
     let rsoSQL = `select r.RSOID, r.RSOName from rso r where r.adminId=${req.query.user}`; //succesfull
     connection.query(rsoSQL, (err, result) =>{
@@ -193,7 +191,6 @@ app.get('/RSO', (req, res)=>{
     }});}
   })
   }
->>>>>>> Stashed changes
 }) 
 app.get('/createRSO',(req,res)=>{
   res.render('createRSOPage',{userName:req.query.user});
