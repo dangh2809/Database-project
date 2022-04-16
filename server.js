@@ -104,7 +104,8 @@ app.get('/createEvent',(req,res)=>{
   
 })
 app.get('/RSO', (req, res)=>{
-  let rsoUserSQL=`select * from (Select r.* from RSO r Inner Join(Select univeristyID from users u where u.userID=${req.query.user})c on c.univeristyID=r.universityID) p where p.RSOID not in (select RSOID from userrso where userID=${req.query.user}) and p.RSOstatus=0`;
+  if (req.query.user){
+    let rsoUserSQL=`select * from (Select r.* from RSO r Inner Join(Select univeristyID from users u where u.userID=${req.query.user})c on c.univeristyID=r.universityID) p where p.RSOID not in (select RSOID from userrso where userID=${req.query.user}) and p.RSOstatus=0`;
   connection.query(rsoUserSQL, (err, result)=>{
     if (err){
       console.log("error in rsousersql");
@@ -114,7 +115,7 @@ app.get('/RSO', (req, res)=>{
       res.render('RSOPage', {userName: req.query.user, RSOList: results});
     }
   })
-  
+  }
 }) 
 app.get('/createRSO',(req,res)=>{
   res.render('createRSOPage',{userName:req.query.user});
@@ -291,6 +292,54 @@ console.log(returnObject);
 
 
 }) 
+ 
+
+app.post('/RSO', (req, res)=>{
+  if (req.query.user && req.query.rso){
+    let userrsosql = `insert into userrso(userID, RSOID) values(${req.query.user}, ${req.query.rso})`;
+    connection.query(userrsosql, (err, result) =>{
+      if (err){
+        console.log(err);
+        throw err;
+      } else {
+        // update number of student of the rso when user join
+        let updateStudentNumSQL = `UPDATE rso SET numberOfStudents= numberOfStudents + 1 where RSOID=${req.query.user}`;
+        connection.query(updateStudentNumSQL, (err, result)=>{
+          if (err){
+            console.log("error in studentNumSQL");
+            throw err;
+          } else {
+            //var studentNum= JSON.parse(JSON.stringify(result));
+            let studentNumSQL = `select numberOfStudents from rso where RSOID=${req.query.rso}`;
+            connection.query(studentNumSQL, (err, result)=>{
+              if (err){
+                console.log("error in studentNumSQL");
+                throw err;
+              } else {
+                var studentNum= JSON.parse(JSON.stringify(result));
+                if (studentNum[0].numberOfStudents >= 5){
+                  // when there is more than 1 host and 4 other students in rso
+                  let updateRSOstatusSQL = `UPDATE rso SET  RSOstatus=1 where RSOID =${req.query.rso}`;
+                  connection.query(updateRSOstatusSQL, (err, result)=>{
+                    if (err){
+                      console.log("error in updateRSOstatus");
+                      throw err;
+                    } else {
+                      res.redirect(`/RSO?user=${req.query.user}`);
+                    }
+                  })
+                } else {
+                  // when there is not enough people in rso
+                  res.redirect(`/RSO?user=${req.query.user}`);
+                }
+              }
+            })
+          }
+        })
+      }
+    })
+  }
+})
 app.post('/createRSO', [
   check('rsoName','Event cannot be empty').exists().isLength({min:1}),
   check('rsoDescription','Description cannot be empty').exists().isLength({min:1})
