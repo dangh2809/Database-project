@@ -104,21 +104,17 @@ app.get('/createEvent',(req,res)=>{
   
 })
 app.get('/RSO', (req, res)=>{
-  res.render('RSOPage', {userName: req.query.user, RSOList: [
-    {
-      name: "hieu",
-      phone: "234"
-    },
-    {
-      name: "huy",
-      phone: "178"
-    },
-    {
-      name: "na",
-      phone: "931"
-    },
-
-  ]});
+  let rsoUserSQL=`select * from (Select r.* from RSO r Inner Join(Select univeristyID from users u where u.userID=${req.query.user})c on c.univeristyID=r.universityID) p where p.RSOID not in (select RSOID from userrso where userID=${req.query.user}) and p.RSOstatus=0`;
+  connection.query(rsoUserSQL, (err, result)=>{
+    if (err){
+      console.log("error in rsousersql");
+      throw err;
+    } else {
+      var results= JSON.parse(JSON.stringify(result));
+      res.render('RSOPage', {userName: req.query.user, RSOList: results});
+    }
+  })
+  
 }) 
 app.get('/createRSO',(req,res)=>{
   res.render('createRSOPage',{userName:req.query.user});
