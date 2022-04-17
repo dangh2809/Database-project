@@ -90,7 +90,9 @@ app.get('/event',(req,res)=>{
     var results= JSON.parse(JSON.stringify(result))
     var dat ,time,eventTime=''
     var arrayOFEvents=[]
-    console.log("pmsada"+results)
+    console.log("pmsada")
+    console.log(results);
+    let locationSQL =`select * from location where locationID=${results[0].eventLocation}`;
     results.forEach(element => {
         //NOTE SAVE DATE AS UTC
          dat=element.eventDate;
@@ -102,24 +104,34 @@ app.get('/event',(req,res)=>{
 
         console.log(element.eventdate)
          time= element.eventTime;
-    arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat,"eventID":element.eventId })
+    arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat,"eventID":element.eventId, "locationID": element.eventLocation })
   });
-returnObject["eventData"] = arrayOFEvents;
-var eventCommentSQL="select c.*,u.firstname,u.lastname from eventcomment c inner join users u on u.userID=c.userID  where eventID="+req.query.event+"  order by timeComment ;";
-  connection.query(eventCommentSQL, function (err, result) {
-    var arrayP=[];
-    console.log("JO:AAA")
-    var results= JSON.parse(JSON.stringify(result))
-    var dat ,time,eventTime=''
-    results.forEach(element => {
-    arrayP.push({"comment":element.commentDescrip,"Name":element.firstname+" "+element.lastname,"rating":element.rating})
-    
-    });
+  console.log(arrayOFEvents);
+  returnObject["eventData"] = arrayOFEvents;
+  let locationIDSQL=`select * from location where locationID=${arrayOFEvents[0].locationID}`;
+  connection.query(locationIDSQL, (err, result)=>{
+    if (!err){
+      var coordinates = JSON.parse(JSON.stringify(result));
+      returnObject["eventData"][0]["locationX"] = coordinates[0].locationX;
+      returnObject["eventData"][0]["locationY"] = coordinates[0].locationY;
+      var eventCommentSQL="select c.*,u.firstname,u.lastname from eventcomment c inner join users u on u.userID=c.userID  where eventID="+req.query.event+"  order by timeComment ;";
+      connection.query(eventCommentSQL, function (err, result) {
+        var arrayP=[];
+        console.log("JO:AAA")
+        var results= JSON.parse(JSON.stringify(result));
+        var dat ,time,eventTime=''
+        results.forEach(element => {
+        arrayP.push({"comment":element.commentDescrip,"Name":element.firstname+" "+element.lastname,"rating":element.rating})
+        });
     returnObject["comments"] = arrayP;
     console.log(returnObject["comments"])
+    console.log(returnObject);
     res.render('eventPage',{data:returnObject,comment:arrayP,user:req.query.user,event:req.query.event});
 
   });
+    }
+  })
+  
 
 });
 })
@@ -205,7 +217,7 @@ app.get('/',(req,res)=>{
 
   //var trendSQL = "Select * from CREATOR_EVENT ORDER BY ratingCount DESC LIMIT 10;";
   //Public
- var publicSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=4";
+ var publicSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip, l.locationX, l.locationY FROM uniEvents e, location l where e.eventType=4 and e.eventLocation = l.locationID";
  //Private 
  
  var returnObject ={}
@@ -224,7 +236,7 @@ app.get('/',(req,res)=>{
         });
         console.log(element.eventdate)
          time= element.eventTime;
-    arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat,"eventID":element.eventId })
+    arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat,"eventID":element.eventId, "locationX": element.locationX, "locationY": element.locationY })
 
   });
 returnObject["Public"] = arrayOFEvents;
@@ -246,7 +258,7 @@ connection.query(userSQL, function (err, result) {
   arrayOFEvents =[]
   if(results[0].univeristyID)
   {
-    var privateSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip FROM uniEvents e where eventType=14 and uniID ="+results[0].univeristyID;
+    var privateSql = "SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip, l.locationX, l.locationY FROM uniEvents e, location l where eventType=14 and e.eventLocation = l.locationID and uniID ="+results[0].univeristyID;
     console.log(privateSql)
       connection.query(privateSql, function (err, result2) {
         
@@ -262,11 +274,11 @@ connection.query(userSQL, function (err, result) {
             });
             console.log(element.eventdate)
              time= element.eventTime;
-        arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat ,"eventID":element.eventId})
+        arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":time,"eventDate":dat ,"eventID":element.eventId, "locationX": element.locationX, "locationY": element.locationY })
             
       });
     returnObject["Private"] = arrayOFEvents; 
-    var RSOsql="SELECT e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip,c.RSOName FROM uniEvents e INNER JOIN (SELECT r.RSOID,r.RSOName FROM userrso ur inner join rso r on ur.RSOID= r.RSOID where userID="+req.query.user+") c on e.RSOId=c.RSOID GROUP BY e.RSOId;"
+    var RSOsql=`select e.*, l.locationX,l.locationY from (SELECT e.eventLocation, e.eventId,e.eventName,e.eventdate,e.eventTime,e.eventDescrip,c.RSOName FROM uniEvents e INNER JOIN (SELECT r.RSOID,r.RSOName FROM userrso ur inner join rso r on ur.RSOID= r.RSOID where userID=${req.query.user}) c on e.RSOId=c.RSOID GROUP BY e.RSOId) e, location l where e.eventLocation = l.locationID`;
     console.log(RSOsql)
     connection.query(RSOsql, function (err, result) {
       arrayOFEvents =[]
@@ -290,8 +302,8 @@ connection.query(userSQL, function (err, result) {
               });
                time=new Date(dat).toLocaleTimeString();
               eventTime= time
-              arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":eventTime,"eventDate":dat ,"eventID":element.eventId })
-              console.log( arrayOFEvents)
+              arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":eventTime,"eventDate":dat ,"eventID":element.eventId,"locationX": element.locationX, "locationY": element.locationY})
+              console.log( arrayOFEvents);
             }
             else
             {
@@ -305,7 +317,7 @@ connection.query(userSQL, function (err, result) {
               });
                time=new Date(dat).toLocaleTimeString();
               eventTime= time
-              arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":eventTime,"eventDate":dat,"eventID":element.eventId  })
+              arrayOFEvents.push({ "eventTitle": element.eventName,"eventDecrip":element.eventDescrip,"eventTime":eventTime,"eventDate":dat,"eventID":element.eventId,"locationX": element.locationX, "locationY": element.locationY })
               curCat=element.RSOName;
             }
           
