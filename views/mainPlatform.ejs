@@ -113,7 +113,17 @@
               <div class="modal-content">
                 <div class="modal-header  p-0 ">
                     <button type="button" class="btn-close btnCloseMod" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <img class="modHeaderImg" src="https://occ-0-1433-1432.1.nflxso.net/dnm/api/v6/X194eJsgWBDE2aQbaNdmCXGUP-Y/AAAABUjsKDiaKwLmrV662pwmVKEtRmbJI-s8M9ojCqr2QEdnPUJPX86RP-n9IGXxGcaHWkTf-cwz5e4kBLN3jYLM7HuBfYA.webp?r=01d">  
+                    <iframe 
+                    class="mapImg"
+                    width="100%" 
+                    height="100%" 
+                    frameborder="0" 
+                    scrolling="no" 
+                    marginheight="0" 
+                    marginwidth="0" 
+                    src=""
+                >
+                </iframe>
                 </div>
                 <div class="modal-body">
                   <h4 class="modal-title"></h4>
@@ -157,13 +167,13 @@
   console.log(eventObj)
   var modalTitle = exampleModal.querySelector('.modal-title')
   var eventLink = exampleModal.querySelector('.btn-tick')
-  var modalImg = exampleModal.querySelector('.modHeaderImg')
+  var modalImg = exampleModal.querySelector('.mapImg')
   var eventDecp = exampleModal.querySelector('.modal-descrip')
   var eventPrice = exampleModal.querySelector('.eventPrice')
   var eventtime = exampleModal.querySelector('.eventTime')          
   var eventDate = exampleModal.querySelector('.eventDate')
   var eventRate = exampleModal.querySelector('.eventRate')
-  modalImg.src = eventObj.eventImage
+  modalImg.src = `https://maps.google.com/maps?q=${data["eventData"][0].locationX},${data["eventData"][0].locationX}&hl=es&z=14&amp;output=embed`;
   modalTitle.textContent = eventObj.eventTitle
   eventDecp.textContent = eventObj.eventDecrip
   eventDate.textContent = eventObj.eventDate
