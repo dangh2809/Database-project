@@ -240,6 +240,9 @@ connection.query(userSQL, function (err, result) {
   var results= JSON.parse(JSON.stringify(result))
   console.log(results)
   console.log(results[0].univeristyID)
+  var userfullName = results[0].firstname+" "+results[0].lastname;
+  var userType = results[0].userType;
+
   arrayOFEvents =[]
   if(results[0].univeristyID)
   {
@@ -309,21 +312,20 @@ connection.query(userSQL, function (err, result) {
           });
       
           returnObject[curCat] = arrayOFEvents;
-          res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+          res.render('mainPlatform',{ lists:returnObject ,name:userfullName,typeU:userType,userName:req.query.user});
 
         });
 
     });
   }
   else{
-    res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
+    res.render('mainPlatform',{ lists:returnObject ,name:userfullName,typeU:userType,userName:req.query.user});
   }
 });
 }
 else
 {
   res.render('mainPlatform',{ lists:returnObject ,userName:req.query.user});
-
 }
 });
 
@@ -383,7 +385,7 @@ app.post('/RSO', (req, res)=>{
         throw err;
       } else {
         // update number of student of the rso when user join
-        let updateStudentNumSQL = `UPDATE rso SET numberOfStudents= numberOfStudents + 1 where RSOID=${req.query.user}`;
+        let updateStudentNumSQL = `UPDATE rso SET numberOfStudents= numberOfStudents + 1 where RSOID=${req.query.rso}`;
         connection.query(updateStudentNumSQL, (err, result)=>{
           if (err){
             console.log("error in studentNumSQL");
@@ -405,9 +407,15 @@ app.post('/RSO', (req, res)=>{
                       console.log("error in updateRSOstatus");
                       throw err;
                     } else {
+                      let updateUserSQL = `UPDATE users SET  userType=14 where userID= (Select adminId from rso where RSOID=${req.query.rso})`;
+                      connection.query(updateUserSQL, (err, result)=>{
+                        if (err){
+                          console.log("error in updateusertatus");
+                          throw err;
+                        } else {
                       res.redirect(`/RSO?user=${req.query.user}`);
-                    }
-                  })
+                    }})
+                  }})
                 } else {
                   // when there is not enough people in rso
                   res.redirect(`/RSO?user=${req.query.user}`);
@@ -834,10 +842,16 @@ app.post('/signUpProcess',[
       })
     }
     else{
-
-    
+            
     var object = req.body;
-    var sql = "insert into users(firstname,lastname,email,userPassword,userType) Values ('"+object.firstNmeInput+"','"+object.lastNmeInput+"','"+object.emailInput+"','"+object.passwordInput+"',24)";
+    var emailDomain=object.emailInput.split('@')[1]
+    var uniEmail = "Select universityID from university where uniEmailDomain='"+emailDomain+"'";
+    console.log(uniEmail)
+    connection.query(uniEmail, function (err, result1) {
+      console.log(result1)
+      if(result1[0])
+      {
+    var sql = "insert into users(firstname,lastname,email,userPassword,userType,univeristyID) Values ('"+object.firstNmeInput+"','"+object.lastNmeInput+"','"+object.emailInput+"','"+object.passwordInput+"',24,"+result1[0].universityID+")";
     connection.query(sql, function (err, result) {
       if (err) throw err;
       var sql = "Select firstname,lastname,userID from USERS where email='"+object.emailInput+"'AND userPassword='"+object.passwordInput+"'";
@@ -852,7 +866,14 @@ app.post('/signUpProcess',[
         }});
     });
     console.log(JSON.stringify(req.body)+" ");
-  }
+      }
+      else
+      {
+        const dalert = [ {"msg":"No University with that domain."}]
+        res.render('signUpPage',
+      {alert: dalert})
+      }
+  })}
 });
 
 function getVideos (){

@@ -37,15 +37,18 @@
                 <div>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                       <%= userName %>  
+                       <%= name %>  
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                          <li><a class="dropdown-item" href="">Profile</a></li>
-                          <li><a class="dropdown-item" href="">Tickets</a></li>
-                          <li><a class="dropdown-item" href="">Log Out</a></li>
-                          <li><a class="dropdown-item" href="/createEvent?user=<%=userName%>">Create an event</a></li>
-                          <li><a class="dropdown-item" href="/createRSO?user=<%=userName%>">Create RSO</a></li>
+                          <%if(typeU==4){%>
                           <li><a class="dropdown-item" href="/createUniversity?user=<%=userName%>">Create an university</a></li>
+                          <%}%>
+                          <%if(typeU==4||typeU==14){%>
+                          <li><a class="dropdown-item" href="/createEvent?user=<%=userName%>">Create an event</a></li>
+                          <%}%>
+                          <li><a class="dropdown-item" href="/createRSO?user=<%=userName%>">Create RSO</a></li>
+                          <li><a class="dropdown-item" href="/RSO?user=<%=userName%>">Join RSO</a></li>
+                          <li><a class="dropdown-item" href="/">Log Out</a></li>
 
                         </ul>
                       </li>
